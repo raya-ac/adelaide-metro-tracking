@@ -2556,7 +2556,7 @@
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="/adelaide-metro/qrcode.js"></script>
+    <script src="/adelaide-metro/qrcode.js?v=2"></script>
     <script src="/static/adelaide-metro-stops.js"></script>
     <script>
         // State
@@ -4341,7 +4341,7 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', async () => {
                 try {
-                    const registration = await navigator.serviceWorker.register('/adelaide-metro/sw.js');
+                    const registration = await navigator.serviceWorker.register('/adelaide-metro/sw.js?v=2');
                     console.log('[SW] Registered:', registration.scope);
                     
                     // Check for updates
