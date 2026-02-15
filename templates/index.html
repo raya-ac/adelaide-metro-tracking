@@ -2556,7 +2556,7 @@
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="/templates/adelaide-metro/qrcode.js"></script>
+    <script src="/adelaide-metro/qrcode.js"></script>
     <script src="/static/adelaide-metro-stops.js"></script>
     <script>
         // State
@@ -2658,6 +2658,13 @@
                     switchTab(tab);
                 });
             });
+            
+            // Initialize hidden attributes for accessibility
+            document.querySelectorAll('.tab-panel').forEach(panel => {
+                if (!panel.classList.contains('active')) {
+                    panel.setAttribute('hidden', '');
+                }
+            });
         }
 
         function switchTab(tab) {
@@ -2668,6 +2675,25 @@
             document.querySelectorAll('.tab-panel').forEach(panel => {
                 panel.classList.toggle('active', panel.id === tab + '-panel');
             });
+            
+            // Update ARIA attributes
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                const isActive = btn.dataset.tab === tab;
+                btn.setAttribute('aria-selected', isActive);
+                if (isActive) {
+                    document.getElementById(btn.getAttribute('aria-controls')).removeAttribute('hidden');
+                }
+            });
+            
+            // Hide inactive panels for accessibility
+            document.querySelectorAll('.tab-panel').forEach(panel => {
+                if (!panel.classList.contains('active')) {
+                    panel.setAttribute('hidden', '');
+                } else {
+                    panel.removeAttribute('hidden');
+                }
+            });
+            
             if (tab === 'map' && map) {
                 setTimeout(() => map.invalidateSize(), 100);
             }
@@ -2677,6 +2703,16 @@
                     findNearbyStops();
                 }, 100);
             }
+            // Refresh favorites when Favorites tab is opened
+            if (tab === 'favorites') {
+                renderFavorites();
+            }
+            // Refresh alerts when Alerts tab is opened
+            if (tab === 'alerts') {
+                renderAlertHistory();
+            }
+            
+            announceToScreenReader(`Switched to ${tab} tab`);
         }
 
         function initMap() {
@@ -3195,7 +3231,23 @@
             const html = filtered.map(v => {
                 const config = typeConfig[v.type];
                 const isSoon = v.arrival_minutes <= 2;
-                return `<div class="vehicle-card ${v.type}" onclick="selectVehicle('${v.id}')"><div class="vehicle-header"><div class="vehicle-icon ${v.type}"><i class="fas ${config.icon}" style="color: ${config.color}"></i></div><div class="vehicle-info"><div class="vehicle-route">${v.route_name}<span class="status-badge ${v.status}">${v.status}</span></div><div class="vehicle-destination">To ${v.destination}</div></div><div class="arrival-time ${isSoon ? 'soon' : ''}">${v.arrival_minutes}m</div></div><div class="vehicle-details"><div class="detail-item"><i class="fas fa-map-marker-alt"></i>Next: ${v.next_stop}</div><div class="detail-item"><i class="fas fa-tachometer-alt"></i>${v.speed} km/h</div></div></div>`;
+                const statusText = v.status === 'on-time' ? 'on time' : v.status;
+                return `<div class="vehicle-card ${v.type}" onclick="selectVehicle('${v.id}')" role="button" tabindex="0" 
+                    aria-label="${config.label} ${v.route_name} to ${v.destination}, ${statusText}, arriving in ${v.arrival_minutes} minutes, next stop ${v.next_stop}"
+                    onkeydown="if(event.key==='Enter'||event.key===' ') selectVehicle('${v.id}')">
+                    <div class="vehicle-header">
+                        <div class="vehicle-icon ${v.type}"><i class="fas ${config.icon}" style="color: ${config.color}"></i></div>
+                        <div class="vehicle-info">
+                            <div class="vehicle-route">${v.route_name}<span class="status-badge ${v.status}">${v.status}</span></div>
+                            <div class="vehicle-destination">To ${v.destination}</div>
+                        </div>
+                        <div class="arrival-time ${isSoon ? 'soon' : ''}" aria-label="Arriving in ${v.arrival_minutes} minutes">${v.arrival_minutes}m</div>
+                    </div>
+                    <div class="vehicle-details">
+                        <div class="detail-item"><i class="fas fa-map-marker-alt"></i>Next: ${v.next_stop}</div>
+                        <div class="detail-item"><i class="fas fa-tachometer-alt"></i>${v.speed} km/h</div>
+                    </div>
+                </div>`;
             }).join('');
             
             // Single DOM update
@@ -4289,7 +4341,7 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', async () => {
                 try {
-                    const registration = await navigator.serviceWorker.register('/templates/adelaide-metro/sw.js');
+                    const registration = await navigator.serviceWorker.register('/adelaide-metro/sw.js');
                     console.log('[SW] Registered:', registration.scope);
                     
                     // Check for updates
@@ -5023,6 +5075,5 @@
             }
         });
     </script>
-    <script src="/static/adelaide-metro-enhanced.js"></script>
 </body>
 </html>

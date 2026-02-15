@@ -619,6 +619,16 @@ def index():
     """Main Adelaide Metro tracker page"""
     return send_from_directory('/opt/raya-monitor/templates/adelaide-metro', 'index.html')
 
+@adelaide_metro_bp.route('/qrcode.js')
+def serve_qrcode_js():
+    """Serve QR code library"""
+    return send_from_directory('/opt/raya-monitor/templates/adelaide-metro', 'qrcode.js')
+
+@adelaide_metro_bp.route('/sw.js')
+def serve_sw_js():
+    """Serve Service Worker"""
+    return send_from_directory('/opt/raya-monitor/templates/adelaide-metro', 'sw.js')
+
 @adelaide_metro_bp.route('/api/routes')
 def get_routes():
     """Get all routes"""
