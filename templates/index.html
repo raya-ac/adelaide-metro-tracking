@@ -2682,6 +2682,11 @@
                                     <i class="fas fa-sync-alt"></i>
                                 </button>
                             </div>
+                            
+                            <!-- Trip Planner Stops (From/To) -->
+                            <div id="trip-planner-stops" style="margin-bottom: 1rem;"></div>
+                            
+                            <!-- GPS-based Nearby Stops -->
                             <div class="location-status" id="location-status" style="display:none;">Finding your location...</div>
                             <div class="nearby-stops-list" id="nearby-stops-list"></div>
                         </div>
@@ -2935,6 +2940,7 @@
             if (tab === 'plan') {
                 setTimeout(() => {
                     findNearbyStops();
+                    renderTripPlannerStops(); // Show trip planner stops
                 }, 100);
             }
             // Refresh favorites when Favorites tab is opened
@@ -3009,7 +3015,10 @@
                 dropdown.querySelectorAll('.autocomplete-item').forEach(item => {
                     item.addEventListener('click', () => {
                         input.value = item.dataset.value;
+                        input.dataset.lat = item.dataset.lat;
+                        input.dataset.lon = item.dataset.lon;
                         dropdown.classList.remove('active');
+                        renderTripPlannerStops(); // Update the displayed stops
                     });
                 });
             });
@@ -3034,6 +3043,7 @@
                         input.dataset.lat = stop.lat;
                         input.dataset.lon = stop.lon;
                         dropdown.classList.remove('active');
+                        renderTripPlannerStops(); // Update the displayed stops
                     }
                 } else if (e.key === 'Escape') {
                     dropdown.classList.remove('active');
@@ -3066,6 +3076,7 @@
                             input.dataset.lat = item.dataset.lat;
                             input.dataset.lon = item.dataset.lon;
                             dropdown.classList.remove('active');
+                            renderTripPlannerStops(); // Update the displayed stops
                         });
                     });
                 }
@@ -3120,8 +3131,61 @@
             initNearbyStops();
         }
 
-        // Initialize Nearby Stops Feature
-        function initNearbyStops() {
+        // Render stops from trip planner inputs
+        function renderTripPlannerStops() {
+            const container = document.getElementById('trip-planner-stops');
+            if (!container) return;
+            
+            const fromInput = document.getElementById('trip-from');
+            const toInput = document.getElementById('trip-to');
+            
+            const fromValue = fromInput?.value?.trim();
+            const toValue = toInput?.value?.trim();
+            
+            let html = '';
+            
+            // Show From stop if entered
+            if (fromValue) {
+                const fromStop = ADELAIDE_STOPS.find(s => s.n === fromValue);
+                html += `
+                    <div style="background: var(--bg-tertiary); border-radius: var(--radius); padding: 0.75rem; margin-bottom: 0.5rem; border-left: 3px solid #10b981;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                            <i class="fas fa-circle" style="color: #10b981; font-size: 0.5rem;"></i>
+                            <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">From</span>
+                        </div>
+                        <div style="font-weight: 600;">${fromValue}</div>
+                        ${fromStop ? `<div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">${fromStop.i}</div>
+                        <div id="next-departures-from" class="next-departures-container" style="margin-top: 0.5rem;"></div>` : ''}
+                    </div>
+                `;
+            }
+            
+            // Show To stop if entered
+            if (toValue) {
+                const toStop = ADELAIDE_STOPS.find(s => s.n === toValue);
+                html += `
+                    <div style="background: var(--bg-tertiary); border-radius: var(--radius); padding: 0.75rem; margin-bottom: 0.5rem; border-left: 3px solid #ef4444;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                            <i class="fas fa-circle" style="color: #ef4444; font-size: 0.5rem;"></i>
+                            <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">To</span>
+                        </div>
+                        <div style="font-weight: 600;">${toValue}</div>
+                        ${toStop ? `<div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">${toStop.i}</div>
+                        <div id="next-departures-to" class="next-departures-container" style="margin-top: 0.5rem;"></div>` : ''}
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = html;
+            
+            // Load next departures for trip planner stops
+            if (fromValue) {
+                renderNextDepartures(fromValue, 'next-departures-from');
+            }
+            if (toValue) {
+                renderNextDepartures(toValue, 'next-departures-to');
+            }
+        }
             const locationStatus = document.getElementById('location-status');
             const refreshBtn = document.getElementById('refresh-location');
             
@@ -3545,6 +3609,8 @@
             from.dataset.lon = to.dataset.lon;
             to.dataset.lat = tempLat;
             to.dataset.lon = tempLon;
+            // Update displayed stops
+            renderTripPlannerStops();
         }
 
         // Get current time in Adelaide timezone
