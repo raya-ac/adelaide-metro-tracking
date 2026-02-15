@@ -88,10 +88,12 @@ Real-time public transport tracking for Adelaide, Australia. Track buses, trains
 
 ### 💰 Trip Cost Calculator
 - Flat fare pricing (Adelaide Metro doesn't use zones)
-- Peak and off-peak pricing
-- Regular and concession prices
+- Peak fares: $4.55 regular / $2.25 concession
+- Off-peak fares: $2.60 regular / $1.30 concession
+- Peak hours: 3PM-9AM Mon-Fri, all day Saturday
+- Off-peak: 9AM-3PM Mon-Fri, all day Sunday
 - Displayed in trip results
-- Automatically detects peak hours (6-9am, 3-7pm weekdays)
+- Updated for 2025-2026 fares
 
 ### 🗺️ Journey Map
 - Full-screen map view for tracking

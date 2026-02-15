@@ -5059,27 +5059,30 @@
         function calculateFare(fromStop, toStop) {
             if (!fromStop || !toStop) return null;
             
-            // Calculate distance
-            const distance = calculateDistance(fromStop.lat, fromStop.lon, toStop.lat, toStop.lon);
-            
             // Adelaide Metro uses flat fare + peak/off-peak pricing (not zones)
-            // Current fares (approximate)
+            // Current fares from 1 July 2025:
+            // Peak: $4.55 regular / $2.25 concession (3PM-9AM Mon-Fri, all day Sat)
+            // Off-peak: $2.60 regular / $1.30 concession (9AM-3PM Mon-Fri, all day Sun)
             const now = new Date();
             const hour = now.getHours();
-            const day = now.getDay();
+            const day = now.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
             
-            // Peak hours: 6am-9am and 3pm-7pm on weekdays
+            const isSaturday = day === 6;
+            const isSunday = day === 0;
             const isWeekday = day >= 1 && day <= 5;
-            const isPeak = isWeekday && ((hour >= 6 && hour < 9) || (hour >= 15 && hour < 19));
             
-            // Adelaide Metro flat fares (2024/2025 approximate)
+            // Peak: 3PM-9AM Mon-Fri (15:00-09:00), all day Saturday
+            // Off-peak: 9AM-3PM Mon-Fri, all day Sunday
+            const isPeak = isSaturday || (isWeekday && (hour >= 15 || hour < 9));
+            
+            // Adelaide Metro fares effective 1 July 2025
             const fares = isPeak ? {
-                regular: 4.05,
-                concession: 2.00,
+                regular: 4.55,
+                concession: 2.25,
                 label: 'Peak'
             } : {
-                regular: 2.25,
-                concession: 1.10,
+                regular: 2.60,
+                concession: 1.30,
                 label: 'Off-Peak'
             };
             
@@ -5087,7 +5090,6 @@
                 regular: fares.regular,
                 concession: fares.concession,
                 label: fares.label,
-                distance: Math.round(distance * 10) / 10,
                 isPeak: isPeak
             };
         }
