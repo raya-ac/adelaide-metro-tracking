@@ -9,6 +9,7 @@
     <meta name="theme-color" content="#0f172a">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="version" content="2.0.0-20260215">
     <title>Adelaide Metro Live</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -3446,6 +3447,9 @@
 
         function renderVehicleList(filterText = '') {
             const container = document.getElementById('vehicle-list');
+            if (!container) return;
+            
+            console.log('renderVehicleList called, vehicles count:', vehicles.length);
             
             let filtered = vehicles;
             if (filterText) {
@@ -3453,8 +3457,10 @@
                 filtered = vehicles.filter(v => v.route_name.toLowerCase().includes(lower) || v.destination.toLowerCase().includes(lower) || v.next_stop.toLowerCase().includes(lower));
             }
             
+            console.log('Filtered vehicles:', filtered.length);
+            
             if (filtered.length === 0) {
-                container.innerHTML = '<div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-title">No vehicles found</div><div class="empty-text">Try adjusting your search</div></div>';
+                container.innerHTML = '<div class="empty-state"><div class="empty-icon">🚌</div><div class="empty-title">No vehicles found</div><div class="empty-text">Check back shortly</div></div>';
                 return;
             }
             
