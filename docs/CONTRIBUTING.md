@@ -58,20 +58,29 @@ We welcome feature ideas! Please:
 ### High Priority
 - [ ] Better route matching algorithm
 - [ ] Offline support / service worker
-- [ ] Accessibility improvements
-- [ ] More comprehensive test coverage
+- [ ] Accessibility improvements (WCAG 2.1 AA compliance)
+- [ ] More comprehensive test coverage (unit + integration tests)
+- [ ] Real-time crowding indicators
+- [ ] Service disruption alerts
+- [ ] VoiceOver / screen reader support
 
 ### Medium Priority  
-- [ ] Trip cost calculator
-- [ ] Crowding indicators
-- [ ] Weather integration
-- [ ] Multiple language support
+- [ ] Trip cost calculator (fare estimator)
+- [ ] Weather integration (show weather at stops)
+- [ ] Multiple language support (i18n)
+- [ ] Favorite/saved trips
+- [ ] Trip history with stats
+- [ ] Export trip data (PDF/ICS)
+- [ ] Real-time seat availability
 
 ### Nice to Have
-- [ ] Dark/light mode toggle improvements
-- [ ] Custom alert sounds
+- [ ] Dark/light mode toggle improvements (auto sunrise/sunset)
+- [ ] Custom alert sounds (choose notification tone)
 - [ ] Trip sharing via QR code
 - [ ] Apple Watch / Wear OS app
+- [ ] Widget support (iOS 16/Android)
+- [ ] Siri/Google Assistant integration
+- [ ] Augmented reality stop finder
 
 ## 🔄 Pull Request Process
 

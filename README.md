@@ -40,6 +40,22 @@ Real-time public transport tracking for Adelaide, Australia. Track buses, trains
 - Route visualization
 - Real-time updates every 10 seconds
 
+## 🗺️ Roadmap
+
+### In Progress
+- [ ] Better route matching algorithm
+- [ ] Offline support / service worker
+- [ ] Accessibility improvements (WCAG 2.1 AA)
+
+### Planned
+- [ ] Trip cost calculator
+- [ ] Crowding indicators
+- [ ] Weather integration
+- [ ] Multiple language support
+- [ ] Trip sharing via QR code
+
+See [CONTRIBUTING.md](docs/CONTRIBUTING.md) for the full roadmap.
+
 ## 🚀 Quick Start
 
 ### Prerequisites
