@@ -5119,25 +5119,53 @@
         
         async function fetchNextDepartures(stopName, limit = 3) {
             try {
-                // Find stop ID from name
+                // Find stop from name
                 const stop = ADELAIDE_STOPS.find(s => s.n === stopName);
                 if (!stop) return [];
                 
-                // Fetch vehicles heading toward this stop
+                // Fetch all vehicles
                 const res = await fetch('/adelaide-metro/api/vehicles');
                 const data = await res.json();
                 
+                // Find vehicles closest to this stop (within 2km) and heading toward it
                 const vehicles = (data.vehicles || [])
-                    .filter(v => v.next_stop?.toLowerCase().includes(stopName.toLowerCase()) ||
-                                  v.destination?.toLowerCase().includes(stopName.toLowerCase()))
+                    .filter(v => {
+                        // Must have valid coordinates
+                        if (!v.lat || !v.lon) return false;
+                        
+                        // Calculate distance to stop
+                        const dist = calculateDistance(stop.lat, stop.lon, v.lat, v.lon);
+                        
+                        // Must be within 2km
+                        if (dist > 2000) return false;
+                        
+                        // Check if vehicle's next_stop matches or is close to this stop
+                        const nextStopMatch = v.next_stop && 
+                            v.next_stop !== 'Unknown' && 
+                            (v.next_stop.toLowerCase().includes(stopName.toLowerCase()) ||
+                             stopName.toLowerCase().includes(v.next_stop.toLowerCase()));
+                        
+                        // Or if destination is relevant (for end-of-line stops)
+                        const destinationMatch = v.destination && 
+                            (v.destination.toLowerCase().includes(stopName.toLowerCase()) ||
+                             stopName.toLowerCase().includes(v.destination.toLowerCase()));
+                        
+                        return nextStopMatch || destinationMatch || dist < 500; // Include if very close
+                    })
+                    .map(v => ({
+                        ...v,
+                        distToStop: calculateDistance(stop.lat, stop.lon, v.lat, v.lon)
+                    }))
+                    .sort((a, b) => a.distToStop - b.distToStop)
                     .slice(0, limit);
                 
                 return vehicles.map(v => ({
                     route: v.route_name,
                     destination: v.destination,
-                    minutes: v.arrival_minutes,
+                    minutes: v.arrival_minutes || Math.max(1, Math.ceil(v.distToStop / 500)), // Estimate if no arrival time
                     type: v.type,
-                    id: v.id
+                    id: v.id,
+                    distToStop: Math.round(v.distToStop)
                 }));
             } catch (e) {
                 console.error('Failed to fetch next departures:', e);
@@ -5151,7 +5179,7 @@
             
             fetchNextDepartures(stopName).then(departures => {
                 if (departures.length === 0) {
-                    container.innerHTML = '<div class="next-departures"><div class="next-departure-item">No upcoming departures</div></div>';
+                    container.innerHTML = '';
                     return;
                 }
                 
@@ -5159,7 +5187,7 @@
                     <div class="next-departures">
                         <div style="font-size: 0.7rem; color: var(--text-muted); margin-bottom: 0.25rem;">Next departures:</div>
                         ${departures.map(d => `
-                            <div class="next-departure-item" onclick="trackVehicle('${d.id}')" style="cursor: pointer;">
+                            <div class="next-departure-item" onclick="selectVehicle('${d.id}')" style="cursor: pointer;">
                                 <div class="next-departure-route">
                                     <span style="color: ${d.type === 'train' ? '#3b82f6' : d.type === 'tram' ? '#06b6d4' : '#10b981'};">
                                         <i class="fas ${d.type === 'train' ? 'fa-train' : d.type === 'tram' ? 'fa-subway' : 'fa-bus'}"></i>
