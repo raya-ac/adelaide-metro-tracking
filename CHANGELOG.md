@@ -5,6 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2026-02-15
+
+### Added
+- **Offline Support** - Service Worker with caching for offline functionality
+- **Favorites/Saved Trips** - Save trips with star button, view in Favorites tab
+- **QR Code Sharing** - Generate and scan QR codes to share trips between devices
+- **Service Alerts Tab** - Dedicated tab for active alerts and alert history
+- **Smart Theme Toggle** - Auto mode switches theme based on time of day
+- **High Contrast Mode** - Accessibility mode with enhanced contrast
+
+### Accessibility (WCAG 2.1 AA)
+- ARIA labels on all interactive elements
+- Skip link for keyboard navigation
+- Live region for screen reader announcements
+- Focus-visible styles for keyboard users
+- Proper tab panel semantics (role, aria-selected, aria-controls)
+
+### Changed
+- Enhanced tab navigation with Favorites and Alerts tabs
+- Updated bottom navigation for mobile
+- Improved offline indicator when network unavailable
+
+### Technical
+- Added Service Worker (`sw.js`) for offline caching
+- Added QR code generation library (`qrcode.js`)
+- localStorage for favorites and alert history
+- Native Web Share API integration
+
 ## [1.0.0] - 2026-02-15
 
 ### Added

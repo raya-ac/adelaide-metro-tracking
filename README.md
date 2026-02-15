@@ -6,6 +6,7 @@ Real-time public transport tracking for Adelaide, Australia. Track buses, trains
 [![Python](https://img.shields.io/badge/Python-3.8+-green)](https://python.org)
 [![Flask](https://img.shields.io/badge/Flask-2.0+-orange)](https://flask.palletsprojects.com)
 [![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
+[![WCAG 2.1](https://img.shields.io/badge/WCAG%202.1-AA-brightgreen)](https://www.w3.org/WAI/WCAG21/quickref/)
 
 ![Adelaide Metro Tracker Screenshot](docs/screenshot.png)
 
@@ -22,17 +23,49 @@ Real-time public transport tracking for Adelaide, Australia. Track buses, trains
 - Multiple route options with walking directions
 - Live vehicle matching for your route
 - Estimated arrival times
+- Save favorite trips for quick access
+
+### 📡 Offline Support
+- Service Worker caches assets for offline use
+- Continue viewing cached data when offline
+- Offline indicator shows connection status
+- Background sync when connection returns
+
+### 🔗 Trip Sharing
+- Generate QR codes for any trip
+- Share trips via native share API
+- Scan QR codes to load shared trips
+- URL-based trip sharing
 
 ### 🔔 Push Notifications
 - Get alerts when your transport is approaching
 - Notifications at 5 min, 2 min, and arrival
 - Works in background on supported browsers
 
+### 🌗 Smart Themes
+- Dark mode (default)
+- Light mode
+- Auto mode (switches based on time of day)
+- High contrast mode for accessibility
+
+### ♿ Accessibility (WCAG 2.1 AA)
+- Full keyboard navigation support
+- Screen reader compatible with ARIA labels
+- Skip links for quick navigation
+- High contrast mode
+- Focus indicators on all interactive elements
+
 ### 📱 Mobile-First Design
 - Responsive glassmorphism UI
 - Bottom navigation for easy thumb reach
 - Swipe gestures between tabs
 - Works on all screen sizes
+
+### 🚨 Service Alerts
+- Real-time service disruption alerts
+- Alert history tracking
+- Visual severity indicators
+- Badge notifications for active alerts
 
 ### 🗺️ Journey Map
 - Full-screen map view for tracking
@@ -42,17 +75,22 @@ Real-time public transport tracking for Adelaide, Australia. Track buses, trains
 
 ## 🗺️ Roadmap
 
+### Recently Completed ✅
+- [x] Offline support / service worker
+- [x] Accessibility improvements (WCAG 2.1 AA)
+- [x] Trip sharing via QR code
+- [x] Favorite/saved trips
+- [x] Auto theme toggle
+- [x] Service disruption alerts
+
 ### In Progress
 - [ ] Better route matching algorithm
-- [ ] Offline support / service worker
-- [ ] Accessibility improvements (WCAG 2.1 AA)
+- [ ] Crowding indicators
 
 ### Planned
 - [ ] Trip cost calculator
-- [ ] Crowding indicators
 - [ ] Weather integration
 - [ ] Multiple language support
-- [ ] Trip sharing via QR code
 
 See [CONTRIBUTING.md](docs/CONTRIBUTING.md) for the full roadmap.
 
@@ -102,7 +140,9 @@ adelaide-metro-tracking/
 ├── adelaide_metro_routes.py    # Route definitions & API endpoints
 ├── adelaide_metro_gtfs_realtime.py  # GTFS-RT data fetching
 ├── templates/
-│   └── index.html             # Single-page application
+│   ├── index.html             # Single-page application
+│   ├── sw.js                  # Service Worker for offline support
+│   └── qrcode.js              # QR code generation library
 ├── static/
 │   ├── adelaide-metro-stops.js # Stop database (2,900+ stops)
 │   └── favicon.ico
@@ -141,14 +181,18 @@ See [docs/API.md](docs/API.md) for detailed documentation.
 - **Data:** GTFS-RT (General Transit Feed Specification - Realtime)
 - **Styling:** CSS3 with glassmorphism effects
 - **Notifications:** Browser Notifications API
+- **Offline:** Service Worker with Cache API
+- **QR Codes:** Custom lightweight QR generator
 
 ## 📱 Browser Support
 
 | Feature | Chrome | Firefox | Safari | Edge |
 |---------|--------|---------|--------|------|
 | Live Tracking | ✅ | ✅ | ✅ | ✅ |
+| Offline Support | ✅ | ✅ | ✅ | ✅ |
 | Push Notifications | ✅ | ✅ | ⚠️* | ✅ |
 | Background Sync | ✅ | ⚠️ | ❌ | ✅ |
+| QR Code Sharing | ✅ | ✅ | ✅ | ✅ |
 
 *Safari requires adding to home screen for push notifications
 
