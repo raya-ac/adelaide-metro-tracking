@@ -108,7 +108,7 @@ chore: Update dependencies
 
 - Open an issue for questions
 - Join our Discord (if available)
-- Email: your.email@example.com
+- Email: me@raya.li
 
 ## 📝 License
 
