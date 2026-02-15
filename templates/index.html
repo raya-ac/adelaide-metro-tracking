@@ -4975,6 +4975,9 @@
         // Override the existing renderTripResults function
         const originalRenderTripResults = renderTripResults;
         renderTripResults = function(container, routes, fromStop, toStop) {
+            // Store routes for vehicle matching
+            plannedRoutes = routes;
+            
             const currentTime = getAdelaideTime();
             const isFav = isFavorite(fromStop.n, toStop.n);
             

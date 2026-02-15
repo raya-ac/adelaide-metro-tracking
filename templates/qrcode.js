@@ -11,43 +11,44 @@
     }
 
     QRCode.prototype.generate = function() {
-        const size = 25;
-        const matrix = this.createMatrix();
+        var size = 25;
+        var matrix = this.createMatrix();
         return this.renderSVG(matrix, size);
     };
 
     QRCode.prototype.createMatrix = function() {
         // Simplified matrix generation - creates a deterministic pattern based on data hash
-        const size = 25;
-        const matrix = [];
-        let hash = 0;
+        var size = 25;
+        var matrix = [];
+        var hash = 0;
+        var i, row, col;
         
         // Simple hash of data
-        for (let i = 0; i < this.data.length; i++) {
+        for (i = 0; i < this.data.length; i++) {
             hash = ((hash << 5) - hash) + this.data.charCodeAt(i);
             hash = hash & hash;
         }
         
         // Generate pseudo-random pattern
-        let seed = Math.abs(hash);
-        const random = () => {
+        var seed = Math.abs(hash);
+        var random = function() {
             seed = (seed * 9301 + 49297) % 233280;
             return seed / 233280;
         };
         
-        for (let row = 0; row < size; row++) {
+        for (row = 0; row < size; row++) {
             matrix[row] = [];
-            for (let col = 0; col < size; col++) {
+            for (col = 0; col < size; col++) {
                 // Position detection patterns (corners)
-                const isPositionPattern = 
+                var isPositionPattern = 
                     (row < 7 && col < 7) || // Top-left
                     (row < 7 && col >= size - 7) || // Top-right
                     (row >= size - 7 && col < 7); // Bottom-left
                 
                 if (isPositionPattern) {
                     // Create position detection pattern
-                    const pr = row < 7 ? row : row - (size - 7);
-                    const pc = col < 7 ? col : col - (size - 7);
+                    var pr = row < 7 ? row : row - (size - 7);
+                    var pc = col < 7 ? col : col - (size - 7);
                     if (col >= size - 7) pc = col - (size - 7);
                     
                     // 7x7 pattern: outer black, middle white, inner black
@@ -69,18 +70,19 @@
     };
 
     QRCode.prototype.renderSVG = function(matrix, size) {
-        const cellSize = 4;
-        const svgSize = size * cellSize;
+        var cellSize = 4;
+        var svgSize = size * cellSize;
+        var row, col, x, y;
         
-        let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${svgSize} ${svgSize}" width="200" height="200">`;
-        svg += `<rect width="100%" height="100%" fill="white"/>`;
+        var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + svgSize + ' ' + svgSize + '" width="200" height="200">';
+        svg += '<rect width="100%" height="100%" fill="white"/>';
         
-        for (let row = 0; row < size; row++) {
-            for (let col = 0; col < size; col++) {
+        for (row = 0; row < size; row++) {
+            for (col = 0; col < size; col++) {
                 if (matrix[row][col]) {
-                    const x = col * cellSize;
-                    const y = row * cellSize;
-                    svg += `<rect x="${x}" y="${y}" width="${cellSize}" height="${cellSize}" fill="black"/>`;
+                    x = col * cellSize;
+                    y = row * cellSize;
+                    svg += '<rect x="' + x + '" y="' + y + '" width="' + cellSize + '" height="' + cellSize + '" fill="black"/>';
                 }
             }
         }
@@ -91,10 +93,11 @@
 
     // Simpler canvas-based generator for better compatibility
     QRCode.prototype.toCanvas = function(canvas) {
-        const ctx = canvas.getContext('2d');
-        const size = 25;
-        const cellSize = Math.floor(canvas.width / size);
-        const matrix = this.createMatrix();
+        var ctx = canvas.getContext('2d');
+        var size = 25;
+        var cellSize = Math.floor(canvas.width / size);
+        var matrix = this.createMatrix();
+        var row, col;
         
         // Clear canvas
         ctx.fillStyle = '#ffffff';
@@ -102,8 +105,8 @@
         
         // Draw modules
         ctx.fillStyle = '#000000';
-        for (let row = 0; row < size; row++) {
-            for (let col = 0; col < size; col++) {
+        for (row = 0; row < size; row++) {
+            for (col = 0; col < size; col++) {
                 if (matrix[row][col]) {
                     ctx.fillRect(col * cellSize, row * cellSize, cellSize, cellSize);
                 }
