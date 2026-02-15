@@ -5062,26 +5062,33 @@
             // Calculate distance
             const distance = calculateDistance(fromStop.lat, fromStop.lon, toStop.lat, toStop.lon);
             
-            // Determine zones (simplified)
-            let zones;
-            if (distance < 5) zones = 1;
-            else if (distance < 15) zones = 2;
-            else zones = 3;
+            // Adelaide Metro uses flat fare + peak/off-peak pricing (not zones)
+            // Current fares (approximate)
+            const now = new Date();
+            const hour = now.getHours();
+            const day = now.getDay();
             
-            // Adelaide Metro fares (approximate)
-            const fares = {
-                1: { regular: 3.20, concession: 1.60 },
-                2: { regular: 4.40, concession: 2.20 },
-                3: { regular: 5.60, concession: 2.80 }
+            // Peak hours: 6am-9am and 3pm-7pm on weekdays
+            const isWeekday = day >= 1 && day <= 5;
+            const isPeak = isWeekday && ((hour >= 6 && hour < 9) || (hour >= 15 && hour < 19));
+            
+            // Adelaide Metro flat fares (2024/2025 approximate)
+            const fares = isPeak ? {
+                regular: 4.05,
+                concession: 2.00,
+                label: 'Peak'
+            } : {
+                regular: 2.25,
+                concession: 1.10,
+                label: 'Off-Peak'
             };
             
-            const fare = fares[zones];
-            
             return {
-                zones: zones,
-                regular: fare.regular,
-                concession: fare.concession,
-                distance: Math.round(distance * 10) / 10
+                regular: fares.regular,
+                concession: fares.concession,
+                label: fares.label,
+                distance: Math.round(distance * 10) / 10,
+                isPeak: isPeak
             };
         }
         
@@ -5091,8 +5098,11 @@
             
             return `
                 <div class="fare-display">
+                    <div style="width: 100%; margin-bottom: 0.5rem;">
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">Estimated Fare (${fare.label})</div>
+                    </div>
                     <div class="fare-type">
-                        <div class="fare-label">Regular (${fare.zones} zone${fare.zones > 1 ? 's' : ''})</div>
+                        <div class="fare-label">Regular</div>
                         <div class="fare-amount">$${fare.regular.toFixed(2)}</div>
                     </div>
                     <div class="fare-type">

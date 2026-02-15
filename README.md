@@ -87,10 +87,11 @@ Real-time public transport tracking for Adelaide, Australia. Track buses, trains
 - Helps choose less crowded services
 
 ### 💰 Trip Cost Calculator
-- Zone-based fare calculation (1-3 zones)
+- Flat fare pricing (Adelaide Metro doesn't use zones)
+- Peak and off-peak pricing
 - Regular and concession prices
 - Displayed in trip results
-- Based on actual stop coordinates
+- Automatically detects peak hours (6-9am, 3-7pm weekdays)
 
 ### 🗺️ Journey Map
 - Full-screen map view for tracking
