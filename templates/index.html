@@ -2569,6 +2569,7 @@
         let selectedVehicle = null;
         let isRefreshing = false;
         let touchStartY = 0;
+        let plannedRoutes = []; // Store planned routes for vehicle matching
 
         const typeConfig = {
             train: { icon: 'fa-train', color: '#3b82f6', label: 'Train' },
@@ -3609,6 +3610,9 @@
 
         // Render trip results
         function renderTripResults(container, routes, fromStop, toStop) {
+            // Store routes for vehicle matching
+            plannedRoutes = routes;
+            
             const currentTime = getAdelaideTime();
             
             let html = `<div class="trip-results-container">
@@ -3866,6 +3870,13 @@
             
             if (!fromStop || !toStop) return;
             
+            // Get the route info
+            const routeInfo = plannedRoutes[routeIndex];
+            if (!routeInfo) {
+                console.error('Route not found at index:', routeIndex);
+                return;
+            }
+            
             // Show journey status
             const statusEl = document.getElementById('journey-status');
             if (statusEl) {
@@ -3874,7 +3885,7 @@
             }
             
             // Show the journey map in the plan tab
-            showJourneyMap(fromStop, toStop, routeIndex);
+            showJourneyMap(fromStop, toStop, routeIndex, routeInfo);
         }
 
         // Journey Map for Plan Tab
@@ -3883,7 +3894,7 @@
         let journeyMapVehicles = {};
         let journeyMapInterval = null;
 
-        function showJourneyMap(fromStop, toStop, routeIndex) {
+        function showJourneyMap(fromStop, toStop, routeIndex, routeInfo) {
             const mapContainer = document.getElementById('journey-map-container');
             const vehiclesContainer = document.getElementById('journey-vehicles');
             const vehiclesList = document.getElementById('journey-vehicles-list');
@@ -3937,36 +3948,36 @@
             // Fit bounds
             journeyMap.fitBounds(journeyMapPolyline.getBounds(), { padding: [60, 60] });
             
-            // Start live updates
-            startJourneyMapUpdates(fromStop, toStop);
+            // Start live updates with route info
+            startJourneyMapUpdates(fromStop, toStop, routeInfo);
             
             // Scroll to map
             mapContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
-        function startJourneyMapUpdates(fromStop, toStop) {
+        function startJourneyMapUpdates(fromStop, toStop, routeInfo) {
             // Clear previous interval
             if (journeyMapInterval) {
                 clearInterval(journeyMapInterval);
             }
             
-            // Update immediately
-            updateJourneyMapVehicles(fromStop, toStop);
+            // Update immediately with route info
+            updateJourneyMapVehicles(fromStop, toStop, routeInfo);
             
             // Update every 10 seconds
             journeyMapInterval = setInterval(() => {
-                updateJourneyMapVehicles(fromStop, toStop);
+                updateJourneyMapVehicles(fromStop, toStop, routeInfo);
             }, 10000);
             
             // Start trip notifications
             startTripNotifications(fromStop, toStop, { name: 'Journey' });
         }
 
-        async function updateJourneyMapVehicles(fromStop, toStop) {
+        async function updateJourneyMapVehicles(fromStop, toStop, routeInfo) {
             const statusEl = document.getElementById('journey-vehicle-status');
             const vehiclesList = document.getElementById('journey-vehicles-list');
             
-            console.log('updateJourneyMapVehicles called with:', fromStop, toStop);
+            console.log('updateJourneyMapVehicles called with:', fromStop, toStop, routeInfo);
             
             // Validate fromStop
             if (!fromStop || !fromStop.lat || !fromStop.lon) {
@@ -3988,32 +3999,65 @@
                     return;
                 }
                 
-                // Filter vehicles - use distance only, simpler approach
+                // Get route names from the planned route legs
+                let targetRouteNames = [];
+                if (routeInfo && routeInfo.legs) {
+                    targetRouteNames = routeInfo.legs
+                        .filter(leg => leg.type === 'transit')
+                        .map(leg => leg.route)
+                        .filter(Boolean);
+                }
+                console.log('Target route names:', targetRouteNames);
+                
+                // Filter vehicles by route matching AND distance
                 let relevantVehicles = vehicles
                     .filter(v => v.lat != null && v.lon != null) // Must have coordinates
                     .map(v => ({
                         ...v,
                         distFrom: calculateDistance(fromStop.lat, fromStop.lon, v.lat, v.lon)
                     }))
-                    .filter(v => v.distFrom < 50) // Within 50km
+                    .filter(v => {
+                        // Must be within reasonable distance
+                        if (v.distFrom > 20) return false; // Within 20km max
+                        
+                        // If we have target routes, match by route name
+                        if (targetRouteNames.length > 0) {
+                            const routeMatch = targetRouteNames.some(targetRoute => {
+                                // Flexible matching - check if vehicle route_name contains target route or vice versa
+                                const vRoute = (v.route_name || '').toLowerCase();
+                                const tRoute = targetRoute.toLowerCase();
+                                return vRoute.includes(tRoute) || tRoute.includes(vRoute) ||
+                                       // Special cases for train lines
+                                       (tRoute.includes('belair') && v.route_id === 'BEL') ||
+                                       (tRoute.includes('seaford') && v.route_id === 'SEA') ||
+                                       (tRoute.includes('gawler') && v.route_id === 'GAW') ||
+                                       (tRoute.includes('flinders') && v.route_id === 'FLI') ||
+                                       (tRoute.includes('outer harbor') && v.route_id === 'OH') ||
+                                       (tRoute.includes('grange') && v.route_id === 'GRA') ||
+                                       (tRoute.includes('tonsley') && v.route_id === 'TON') ||
+                                       // Special cases for trams
+                                       (tRoute.includes('glenelg') && v.route_id === 'GLNELG') ||
+                                       (tRoute.includes('botanic') && v.route_id === 'BTANIC') ||
+                                       (tRoute.includes('entertainment') && v.route_id === 'EC') ||
+                                       // Generic type matching as fallback
+                                       (tRoute.includes('train') && v.type === 'train') ||
+                                       (tRoute.includes('tram') && v.type === 'tram') ||
+                                       (tRoute.includes('bus') && v.type === 'bus');
+                            });
+                            return routeMatch;
+                        }
+                        
+                        // No target routes, just use distance
+                        return v.distFrom < 5; // Within 5km if no route info
+                    })
                     .sort((a, b) => a.distFrom - b.distFrom)
-                    .slice(0, 3);
+                    .slice(0, 5); // Show up to 5 vehicles
                 
-                console.log('Found', relevantVehicles.length, 'vehicles within 50km');
+                console.log('Found', relevantVehicles.length, 'matching vehicles');
                 
                 if (relevantVehicles.length === 0) {
-                    // Show all vehicles for debugging
-                    const allVehicles = vehicles.slice(0, 5).map(v => ({
-                        id: v.id,
-                        route: v.route_name,
-                        lat: v.lat,
-                        lon: v.lon,
-                        dist: v.lat && v.lon ? calculateDistance(fromStop.lat, fromStop.lon, v.lat, v.lon) : 'no coords'
-                    }));
-                    console.log('All vehicles (first 5):', allVehicles);
-                    
-                    statusEl.innerHTML = '<i class="fas fa-info-circle"></i> No vehicles currently nearby. Check again shortly.';
-                    vehiclesList.innerHTML = '<div style="text-align: center; padding: 1rem; color: var(--text-muted);">No live vehicles on this route right now</div>';
+                    statusEl.innerHTML = '<i class="fas fa-info-circle"></i> No vehicles on this route nearby. Try the Map tab to see all vehicles.';
+                    vehiclesList.innerHTML = '<div style="text-align: center; padding: 1rem; color: var(--text-muted);"><p>No live vehicles on this route right now.</p><p style="font-size: 0.8rem; margin-top: 0.5rem;">Looking for: ' + (targetRouteNames.join(', ') || 'Any route') + '</p></div>';
                     return;
                 }
                 
