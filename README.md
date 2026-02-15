@@ -95,6 +95,34 @@ Real-time public transport tracking for Adelaide, Australia. Track buses, trains
 - Displayed in trip results
 - Updated for 2025-2026 fares
 
+### 🌤️ Weather Integration
+- Current weather at your location
+- Temperature display
+- Weather conditions (sunny, cloudy, rainy)
+- Updates every 30 minutes
+- Helps plan your journey
+
+### 🌐 Multiple Language Support
+- English (default)
+- Chinese (Simplified) - 中文
+- Arabic - العربية
+- Language selector in header
+- RTL support for Arabic
+- Easy to add more languages
+
+### 📊 Trip Analytics
+- Track your trip history
+- Most used routes
+- Weekly trip statistics
+- Total distance traveled
+- Stored locally in your browser
+
+### ❓ Help & Support
+- FAQ section with common questions
+- Quick help tips
+- Contact form for feedback
+- Report issues easily
+
 ### 🗺️ Journey Map
 - Full-screen map view for tracking
 - Animated vehicle markers
@@ -114,13 +142,13 @@ Real-time public transport tracking for Adelaide, Australia. Track buses, trains
 - [x] **Next Departures** - Upcoming departures from nearby stops
 - [x] **Crowding Indicators** - Real-time occupancy levels
 - [x] **Trip Cost Calculator** - Zone-based fare estimation
+- [x] **Weather Integration** - Current weather display
+- [x] **Multiple Language Support** - English, Chinese (中文), Arabic (العربية)
+- [x] **Trip Analytics** - Track and analyze your trips
+- [x] **Help & Support** - FAQ and contact system
 
 ### In Progress
 - [ ] Better route matching algorithm
-
-### Planned
-- [ ] Weather integration
-- [ ] Multiple language support
 
 See [CONTRIBUTING.md](docs/CONTRIBUTING.md) for the full roadmap.
 
