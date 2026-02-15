@@ -2857,6 +2857,52 @@
             bus: { icon: 'fa-bus', color: '#10b981', label: 'Bus' }
         };
 
+        // Comprehensive Bus Route Mapping for Trip Planning
+        const BUS_ROUTE_STOPS = {
+            'G40': { name: 'G40', color: '#0072c6', type: 'bus', stops: ['Golden Grove Village', 'Tea Tree Plaza', 'Paradise', 'Klemzig', 'City'] },
+            'G30': { name: 'G30', color: '#00a651', type: 'bus', stops: ['Golden Grove', 'Surrey Downs', 'Wynn Vale', 'City'] },
+            'H20': { name: 'H20', color: '#e31837', type: 'bus', stops: ['Paradise', 'Klemzig', 'City'] },
+            'H30': { name: 'H30', color: '#f7931d', type: 'bus', stops: ['Tea Tree Plaza', 'Modbury', 'Hope Valley', 'City'] },
+            'H22': { name: 'H22', color: '#8b5cf6', type: 'bus', stops: ['Hope Valley', 'City'] },
+            'H24': { name: 'H24', color: '#ec4899', type: 'bus', stops: ['Paradise', 'City'] },
+            'C1': { name: 'C1', color: '#00a651', type: 'bus', stops: ['Tea Tree Plaza', 'Paradise', 'Klemzig', 'City'] },
+            'C2': { name: 'C2', color: '#8c6cae', type: 'bus', stops: ['Paradise', 'Klemzig', 'City'] },
+            'J1': { name: 'J1', color: '#0072c6', type: 'bus', stops: ['West Lakes', 'Westfield West Lakes', 'City'] },
+            'J2': { name: 'J2', color: '#e31837', type: 'bus', stops: ['West Lakes', 'City'] },
+            'W90': { name: 'W90', color: '#f7931d', type: 'bus', stops: ['Westfield West Lakes', 'West Lakes', 'City'] },
+            'M44': { name: 'M44', color: '#06b6d4', type: 'bus', stops: ['Marion', 'Flinders', 'Mitcham', 'City'] },
+            'W80': { name: 'W80', color: '#a855f7', type: 'bus', stops: ['Arndale', 'City'] },
+            '141': { name: '141', color: '#22d3ee', type: 'bus', stops: ['Modbury', 'City'] },
+            '142': { name: '142', color: '#f472b6', type: 'bus', stops: ['Paradise', 'City'] },
+            '143': { name: '143', color: '#4ade80', type: 'bus', stops: ['Tea Tree Plaza', 'City'] },
+            '144': { name: '144', color: '#fbbf24', type: 'bus', stops: ['Golden Grove', 'City'] },
+            '545': { name: '545', color: '#6366f1', type: 'bus', stops: ['Glenelg', 'Brighton', 'Seacliff', 'Marion'] },
+            '546': { name: '546', color: '#8b5cf6', type: 'bus', stops: ['Marion', 'Clovelly Park', 'Tonsley'] },
+            '547': { name: '547', color: '#ec4899', type: 'bus', stops: ['Marion', 'Mitchell Park', 'Tonsley'] },
+            '548': { name: '548', color: '#10b981', type: 'bus', stops: ['Marion', 'Bedford Park', 'Flinders'] },
+            '549': { name: '549', color: '#f59e0b', type: 'bus', stops: ['Marion', 'Seacombe', 'Hallett Cove'] },
+            '720': { name: '720', color: '#3b82f6', type: 'bus', stops: ['City', 'Mount Barker', 'Nairne'] }
+        };
+
+        // Train Route Stops
+        const TRAIN_ROUTE_STOPS = {
+            'Belair': { name: 'Belair', color: '#0072c6', type: 'train', stops: ['Adelaide', 'Mile End', 'Goodwood', 'Unley', 'Mitcham', 'Torrens Park', 'Lynton', 'Eden Hills', 'Blackwood', 'Glenalta', 'Pinera', 'Belair'] },
+            'Gawler': { name: 'Gawler Central', color: '#e31837', type: 'train', stops: ['Adelaide', 'Mawson Lakes', 'Parafield', 'Parafield Gardens', 'Salisbury', 'Elizabeth', 'Smithfield', 'Kudla', 'Munno Para', 'Gawler Central'] },
+            'Seaford': { name: 'Seaford', color: '#f7931d', type: 'train', stops: ['Adelaide', 'Woodlands Park', 'Ascot Park', 'Mitchell Park', 'Marion', 'Hove', 'Brighton', 'Seacliff', 'Marino', 'Hallett Cove', 'Lonsdale', 'Christies Beach', 'Noarlunga', 'Seaford'] },
+            'Flinders': { name: 'Flinders', color: '#00a651', type: 'train', stops: ['Adelaide', 'Mile End', 'Edwardstown', 'Woodlands Park', 'Ascot Park', 'Tonsley', 'Flinders Medical Centre', 'Flinders'] },
+            'Outer Harbor': { name: 'Outer Harbor', color: '#8c6cae', type: 'train', stops: ['Adelaide', 'Port Adelaide', 'Glanville', 'Osborne', 'Taperoo', 'Largs', 'Outer Harbor'] },
+            'Grange': { name: 'Grange', color: '#9c6cae', type: 'train', stops: ['Adelaide', 'Albert Park', 'Cheltenham', 'Grange'] }
+        };
+
+        // Tram Route Stops
+        const TRAM_ROUTE_STOPS = {
+            'Glenelg': { name: 'Glenelg Tram', color: '#e31837', type: 'tram', stops: ['Entertainment Centre', 'City West', 'South Terrace', 'Greenhill Road', 'Glenelg', 'Moseley Square'] },
+            'Botanic': { name: 'Botanic Tram', color: '#0072c6', type: 'tram', stops: ['Festival Plaza', 'Botanic Gardens'] }
+        };
+
+        // Service Alerts
+        let serviceAlerts = [];
+
         // Initialize
         async function init() {
             initTheme();
@@ -3958,12 +4004,203 @@
 
         // Determine bus route
         function getBusRoute(from, to) {
+            // Check if stops are on the same bus route
+            for (const [routeId, routeData] of Object.entries(BUS_ROUTE_STOPS)) {
+                const fromStopName = routeData.stops.find(s => from.n.toLowerCase().includes(s.toLowerCase()) || s.toLowerCase().includes(from.n.toLowerCase()));
+                const toStopName = routeData.stops.find(s => to.n.toLowerCase().includes(s.toLowerCase()) || s.toLowerCase().includes(to.n.toLowerCase()));
+                
+                if (fromStopName && toStopName) {
+                    const fromIndex = routeData.stops.indexOf(fromStopName);
+                    const toIndex = routeData.stops.indexOf(toStopName);
+                    
+                    // Check if stops are in the right order (allowing for reverse direction)
+                    if (fromIndex !== -1 && toIndex !== -1) {
+                        const direction = fromIndex < toIndex ? 'outbound' : 'inbound';
+                        return {
+                            route: routeData.name,
+                            routeId: routeId,
+                            color: routeData.color,
+                            direction: direction,
+                            stops: routeData.stops,
+                            fromIndex: Math.min(fromIndex, toIndex),
+                            toIndex: Math.max(fromIndex, toIndex)
+                        };
+                    }
+                }
+            }
+            
             // Try to extract route number from stop name
             const match = from.n.match(/Stop\s+(\d+)/);
             if (match) {
-                return `Bus (via Stop ${match[1]})`;
+                return {
+                    route: `Bus (Stop ${match[1]})`,
+                    routeId: 'unknown',
+                    color: '#10b981',
+                    direction: 'outbound',
+                    stops: [from.n, to.n],
+                    fromIndex: 0,
+                    toIndex: 1
+                };
             }
-            return 'Bus Service';
+            
+            return {
+                route: 'Bus Service',
+                routeId: 'unknown',
+                color: '#10b981',
+                direction: 'outbound',
+                stops: [from.n, to.n],
+                fromIndex: 0,
+                toIndex: 1
+            };
+        }
+
+        // Find transfer route for multi-modal journeys
+        function findTransferRoute(fromStop, toStop, startTime) {
+            const routes = [];
+            
+            // Check for nearby stops that might have better connections
+            const nearbyFrom = getNearbyStops(fromStop.lat, fromStop.lon, 3, 500);
+            const nearbyTo = getNearbyStops(toStop.lat, toStop.lon, 3, 500);
+            
+            // Try to find a route with one transfer
+            for (const fromNearby of nearbyFrom) {
+                for (const toNearby of nearbyTo) {
+                    if (fromNearby.n === toNearby.n) continue;
+                    
+                    const trainRoute = findDirectRoute(fromNearby, toNearby, addMinutes(startTime, 5));
+                    if (trainRoute && trainRoute.legs[0].mode === 'train') {
+                        const secondLeg = findDirectRoute({n: toNearby.n, lat: toNearby.lat, lon: toNearby.lon}, toStop, addMinutes(startTime, trainRoute.totalTime + 5));
+                        if (secondLeg) {
+                            routes.push({
+                                type: 'transfer',
+                                totalTime: trainRoute.totalTime + secondLeg.totalTime + 5,
+                                walkingDistance: fromNearby.walkDistance + toNearby.walkDistance,
+                                transfers: 1,
+                                legs: [
+                                    {
+                                        type: 'walk',
+                                        from: fromStop.n,
+                                        to: fromNearby.n,
+                                        distance: fromNearby.walkDistance,
+                                        duration: estimateWalkingTime(fromNearby.walkDistance),
+                                        instruction: `Walk ${Math.round(fromNearby.walkDistance)}m to ${fromNearby.n}`
+                                    },
+                                    ...trainRoute.legs,
+                                    {
+                                        type: 'walk',
+                                        from: toNearby.n,
+                                        to: toStop.n,
+                                        distance: toNearby.walkDistance,
+                                        duration: estimateWalkingTime(toNearby.walkDistance),
+                                        instruction: `Walk ${Math.round(toNearby.walkDistance)}m to ${toStop.n}`
+                                    }
+                                ]
+                            });
+                        }
+                    }
+                }
+            }
+            
+            return routes;
+        }
+
+        // Trip Cost Calculator
+        function calculateTripCost(route) {
+            const baseFare = 4.05;
+            const offPeakFare = 2.55;
+            const concessionFare = 2.00;
+            
+            const now = new Date();
+            const hour = now.getHours();
+            const isPeak = (hour >= 7 && hour <= 9) || (hour >= 16 && hour <= 18);
+            
+            const fare = isPeak ? baseFare : offPeakFare;
+            
+            return {
+                metrocard: fare,
+                concession: concessionFare,
+                cash: fare + 1.00,
+                isPeak: isPeak
+            };
+        }
+
+        // Favorite Routes Management
+        function toggleFavoriteRoute(from, to) {
+            try {
+                let favorites = JSON.parse(localStorage.getItem('adelaideMetroFavorites') || '[]');
+                const existingIndex = favorites.findIndex(f => f.from === from && f.to === to);
+                
+                if (existingIndex >= 0) {
+                    favorites.splice(existingIndex, 1);
+                    showNotification('Removed from favorites', 'info');
+                    return false;
+                } else {
+                    favorites.push({ from, to, timestamp: Date.now() });
+                    showNotification('Added to favorites', 'success');
+                }
+                
+                localStorage.setItem('adelaideMetroFavorites', JSON.stringify(favorites));
+                renderFavoriteRoutes();
+                return true;
+            } catch (e) {
+                console.log('Could not toggle favorite:', e);
+                return false;
+            }
+        }
+
+        function renderFavoriteRoutes() {
+            const container = document.getElementById('favorite-routes');
+            if (!container) return;
+            
+            try {
+                const favorites = JSON.parse(localStorage.getItem('adelaideMetroFavorites') || '[]');
+                
+                if (favorites.length === 0) {
+                    container.style.display = 'none';
+                    return;
+                }
+                
+                container.style.display = 'block';
+                container.innerHTML = favorites.map(fav => `
+                    <div class="favorite-route-item" onclick="loadRecentTrip('${fav.from.replace(/'/g, "\\'")}', '${fav.to.replace(/'/g, "\\'")}')">
+                        <div class="favorite-route-icon"><i class="fas fa-star"></i></div>
+                        <div class="favorite-route-details">
+                            <div class="favorite-route-name">${fav.from} <i class="fas fa-arrow-right"></i> ${fav.to}</div>
+                            <div class="favorite-route-hint">Tap to plan trip</div>
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                `).join('');
+            } catch (e) {
+                console.log('Could not render favorites:', e);
+            }
+        }
+
+        // Show notification
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.style.cssText = `
+                position: fixed;
+                top: 80px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#6366f1'};
+                color: white;
+                padding: 0.75rem 1.5rem;
+                border-radius: 12px;
+                font-weight: 600;
+                z-index: 10000;
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            `;
+            notification.innerHTML = `<i class="fas fa-${type === 'success' ? 'check' : type === 'error' ? 'exclamation' : 'info'}-circle"></i> ${message}`;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transition = 'opacity 0.3s';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
         }
 
         // Render trip results
