@@ -1119,6 +1119,184 @@
             color: var(--text-muted);
         }
 
+        /* Line Status Styles */
+        .line-status-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .line-status-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 4px solid transparent;
+        }
+
+        .line-status-item:hover {
+            background: var(--bg-glass);
+            transform: translateX(4px);
+        }
+
+        .line-status-item.good {
+            border-left-color: var(--success);
+        }
+
+        .line-status-item.delayed {
+            border-left-color: var(--warning);
+        }
+
+        .line-status-item.disrupted {
+            border-left-color: var(--danger);
+        }
+
+        .line-status-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        .line-status-icon.good {
+            background: rgba(34, 197, 94, 0.2);
+            color: var(--success);
+        }
+
+        .line-status-icon.delayed {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
+        .line-status-icon.disrupted {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .line-status-info {
+            flex: 1;
+        }
+
+        .line-status-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .line-status-desc {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.125rem;
+        }
+
+        .line-status-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .line-status-badge.good {
+            background: rgba(34, 197, 94, 0.2);
+            color: var(--success);
+        }
+
+        .line-status-badge.delayed {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
+        .line-status-badge.disrupted {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        /* Crowding Indicator Styles */
+        .crowding-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .crowding-indicator.quiet {
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--success);
+        }
+
+        .crowding-indicator.moderate {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning);
+        }
+
+        .crowding-indicator.busy {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+        }
+
+        /* Fare Calculator Styles */
+        .fare-display {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius);
+            margin-top: 0.75rem;
+        }
+
+        .fare-type {
+            flex: 1;
+        }
+
+        .fare-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .fare-amount {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+        }
+
+        /* Next Departures Styles */
+        .next-departures {
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .next-departure-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        .next-departure-route {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .next-departure-time {
+            font-weight: 600;
+            color: var(--accent-primary);
+        }
+
         /* Recent Trips Styles */
         .recent-trips-section {
             margin-top: 1rem;
@@ -2213,6 +2391,10 @@
                     Alerts
                     <span class="badge" id="alert-count" style="display: none;">0</span>
                 </button>
+                <button class="tab-btn" data-tab="status" role="tab" aria-selected="false" aria-controls="status-panel" id="tab-status">
+                    <i class="fas fa-heartbeat" aria-hidden="true"></i>
+                    Status
+                </button>
                 <button class="tab-btn" data-tab="map" role="tab" aria-selected="false" aria-controls="map-panel" id="tab-map">
                     <i class="fas fa-map" aria-hidden="true"></i>
                     Map
@@ -2364,6 +2546,53 @@
                         </div>
                         <div class="alert-history-list" id="alert-history">
                             <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Status Tab -->
+                <div class="tab-panel" id="status-panel" role="tabpanel" aria-labelledby="tab-status">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fas fa-heartbeat" style="color: var(--accent-primary);"></i>
+                                Line Status
+                            </div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);" id="line-status-updated">Updated: --</div>
+                        </div>
+                        <div class="card-body">
+                            <!-- Train Lines -->
+                            <div class="line-status-section">
+                                <div class="section-header" style="margin-bottom: 0.75rem;">
+                                    <i class="fas fa-train" style="color: var(--train);"></i>
+                                    <span>Train Lines</span>
+                                </div>
+                                <div id="train-line-status" class="line-status-list">
+                                    <!-- Populated by JS -->
+                                </div>
+                            </div>
+                            
+                            <!-- Tram Lines -->
+                            <div class="line-status-section" style="margin-top: 1.5rem;">
+                                <div class="section-header" style="margin-bottom: 0.75rem;">
+                                    <i class="fas fa-subway" style="color: var(--tram);"></i>
+                                    <span>Tram Lines</span>
+                                </div>
+                                <div id="tram-line-status" class="line-status-list">
+                                    <!-- Populated by JS -->
+                                </div>
+                            </div>
+                            
+                            <!-- Bus Status Summary -->
+                            <div class="line-status-section" style="margin-top: 1.5rem;">
+                                <div class="section-header" style="margin-bottom: 0.75rem;">
+                                    <i class="fas fa-bus" style="color: var(--bus);"></i>
+                                    <span>Bus Network</span>
+                                </div>
+                                <div id="bus-line-status" class="line-status-list">
+                                    <!-- Populated by JS -->
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -3076,6 +3305,7 @@
                         <div class="nearby-stop-info">
                             <div class="nearby-stop-name">${stop.n}</div>
                             <div class="nearby-stop-details">${stop.i}</div>
+                            <div id="next-departures-${index}" class="next-departures-container"></div>
                         </div>
                         <div class="nearby-stop-distance">
                             <div class="nearby-stop-meters" style="color:${distanceColor}">${distanceText}</div>
@@ -3084,6 +3314,11 @@
                     </div>
                 `;
             }).join('');
+            
+            // Load next departures for each stop
+            nearest.forEach((stop, index) => {
+                renderNextDepartures(stop.n, `next-departures-${index}`);
+            });
         }
         
         // Select a nearby stop as starting point
@@ -3233,6 +3468,7 @@
                 const config = typeConfig[v.type];
                 const isSoon = v.arrival_minutes <= 2;
                 const statusText = v.status === 'on-time' ? 'on time' : v.status;
+                const crowding = renderCrowdingIndicator(v);
                 return `<div class="vehicle-card ${v.type}" onclick="selectVehicle('${v.id}')" role="button" tabindex="0" 
                     aria-label="${config.label} ${v.route_name} to ${v.destination}, ${statusText}, arriving in ${v.arrival_minutes} minutes, next stop ${v.next_stop}"
                     onkeydown="if(event.key==='Enter'||event.key===' ') selectVehicle('${v.id}')">
@@ -3247,6 +3483,7 @@
                     <div class="vehicle-details">
                         <div class="detail-item"><i class="fas fa-map-marker-alt"></i>Next: ${v.next_stop}</div>
                         <div class="detail-item"><i class="fas fa-tachometer-alt"></i>${v.speed} km/h</div>
+                        <div class="detail-item" style="margin-left: auto;">${crowding}</div>
                     </div>
                 </div>`;
             }).join('');
@@ -3270,10 +3507,11 @@
             Object.keys(markers).forEach(id => { if (!filtered.find(v => v.id === id)) { map.removeLayer(markers[id]); delete markers[id]; }});
             filtered.forEach(v => {
                 const config = typeConfig[v.type];
+                const crowding = getCrowdingLevel(v);
                 if (markers[v.id]) { markers[v.id].setLatLng([v.lat, v.lon]); }
                 else {
                     const icon = L.divIcon({ html: `<div style="width: 36px; height: 36px; background: ${config.color}; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 0 2px ${config.color}, 0 4px 12px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; color: white; font-size: 14px;"><i class="fas ${config.icon}"></i></div>`, className: 'vehicle-marker', iconSize: [36, 36], iconAnchor: [18, 18] });
-                    markers[v.id] = L.marker([v.lat, v.lon], { icon }).addTo(map).bindPopup(`<div style="font-family: Inter, sans-serif; min-width: 180px;"><div style="font-weight: 700; font-size: 16px; margin-bottom: 4px;">${v.route_name}</div><div style="color: #64748b; font-size: 13px;">To: ${v.destination}<br>Next: ${v.next_stop}<br>Arriving: ${v.arrival_minutes} min</div></div>`);
+                    markers[v.id] = L.marker([v.lat, v.lon], { icon }).addTo(map).bindPopup(`<div style="font-family: Inter, sans-serif; min-width: 180px;"><div style="font-weight: 700; font-size: 16px; margin-bottom: 4px;">${v.route_name}</div><div style="color: #64748b; font-size: 13px;">To: ${v.destination}<br>Next: ${v.next_stop}<br>Arriving: ${v.arrival_minutes} min<br><span style="color: ${crowding.color};"><i class="fas ${crowding.icon}"></i> ${crowding.label}</span></div></div>`);
                 }
             });
         }
@@ -4614,6 +4852,320 @@
         }
 
         // ==========================================
+        // LINE STATUS PAGE
+        // ==========================================
+        
+        const TRAIN_LINES = [
+            { id: 'BEL', name: 'Belair Line', color: '#3b82f6' },
+            { id: 'SEA', name: 'Seaford Line', color: '#8b5cf6' },
+            { id: 'GAW', name: 'Gawler Line', color: '#f59e0b' },
+            { id: 'FLI', name: 'Flinders Line', color: '#06b6d4' },
+            { id: 'OH', name: 'Outer Harbor Line', color: '#10b981' },
+            { id: 'GRA', name: 'Grange Line', color: '#ec4899' },
+            { id: 'TON', name: 'Tonsley Line', color: '#84cc16' }
+        ];
+        
+        const TRAM_LINES = [
+            { id: 'GLNELG', name: 'Glenelg Tram', color: '#06b6d4' },
+            { id: 'BTANIC', name: 'Botanic Tram', color: '#10b981' },
+            { id: 'EC', name: 'Entertainment Centre', color: '#f59e0b' }
+        ];
+        
+        function renderLineStatus() {
+            const trainContainer = document.getElementById('train-line-status');
+            const tramContainer = document.getElementById('tram-line-status');
+            const busContainer = document.getElementById('bus-line-status');
+            const updatedEl = document.getElementById('line-status-updated');
+            
+            if (!trainContainer || !tramContainer || !busContainer) return;
+            
+            // Get current alerts
+            const activeAlerts = alertHistory.filter(a => 
+                Date.now() - a.seenAt < 24 * 60 * 60 * 1000 // Last 24 hours
+            );
+            
+            // Render train lines
+            trainContainer.innerHTML = TRAIN_LINES.map(line => {
+                const status = getLineStatus(line.name, activeAlerts);
+                return createLineStatusItem(line.name, status, 'train', line.color);
+            }).join('');
+            
+            // Render tram lines
+            tramContainer.innerHTML = TRAM_LINES.map(line => {
+                const status = getLineStatus(line.name, activeAlerts);
+                return createLineStatusItem(line.name, status, 'tram', line.color);
+            }).join('');
+            
+            // Render bus status summary
+            const busStatus = getBusNetworkStatus(activeAlerts);
+            busContainer.innerHTML = `
+                <div class="line-status-item ${busStatus.className}" onclick="filterMapByType('bus')">
+                    <div class="line-status-icon ${busStatus.className}">
+                        <i class="fas fa-bus"></i>
+                    </div>
+                    <div class="line-status-info">
+                        <div class="line-status-name">Bus Network</div>
+                        <div class="line-status-desc">${busStatus.description}</div>
+                    </div>
+                    <div class="line-status-badge ${busStatus.className}">${busStatus.label}</div>
+                </div>
+            `;
+            
+            // Update timestamp
+            if (updatedEl) {
+                updatedEl.textContent = 'Updated: ' + new Date().toLocaleTimeString('en-AU', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+            }
+        }
+        
+        function getLineStatus(lineName, alerts) {
+            const lineAlerts = alerts.filter(a => 
+                a.title?.toLowerCase().includes(lineName.toLowerCase()) ||
+                a.description?.toLowerCase().includes(lineName.toLowerCase())
+            );
+            
+            const criticalAlert = lineAlerts.find(a => a.severity === 'critical');
+            const warningAlert = lineAlerts.find(a => a.severity === 'warning');
+            
+            if (criticalAlert) {
+                return { 
+                    className: 'disrupted', 
+                    label: 'Disrupted', 
+                    description: criticalAlert.title 
+                };
+            }
+            if (warningAlert) {
+                return { 
+                    className: 'delayed', 
+                    label: 'Delayed', 
+                    description: warningAlert.title 
+                };
+            }
+            return { 
+                className: 'good', 
+                label: 'Good Service', 
+                description: 'Running normally' 
+            };
+        }
+        
+        function getBusNetworkStatus(alerts) {
+            const busAlerts = alerts.filter(a => 
+                a.title?.toLowerCase().includes('bus') ||
+                a.description?.toLowerCase().includes('bus')
+            );
+            
+            const criticalAlert = busAlerts.find(a => a.severity === 'critical');
+            const warningAlert = busAlerts.find(a => a.severity === 'warning');
+            
+            if (criticalAlert) {
+                return { 
+                    className: 'disrupted', 
+                    label: 'Disrupted', 
+                    description: criticalAlert.title 
+                };
+            }
+            if (warningAlert) {
+                return { 
+                    className: 'delayed', 
+                    label: 'Delays', 
+                    description: warningAlert.title 
+                };
+            }
+            return { 
+                className: 'good', 
+                label: 'Good Service', 
+                description: 'Most services running normally' 
+            };
+        }
+        
+        function createLineStatusItem(name, status, type, color) {
+            const iconClass = type === 'train' ? 'fa-train' : 'fa-subway';
+            return `
+                <div class="line-status-item ${status.className}" onclick="filterMapByRoute('${name}')">
+                    <div class="line-status-icon ${status.className}" style="background: ${color}20; color: ${color};">
+                        <i class="fas ${iconClass}"></i>
+                    </div>
+                    <div class="line-status-info">
+                        <div class="line-status-name">${name}</div>
+                        <div class="line-status-desc">${status.description}</div>
+                    </div>
+                    <div class="line-status-badge ${status.className}">${status.label}</div>
+                </div>
+            `;
+        }
+        
+        function filterMapByRoute(routeName) {
+            switchTab('map');
+            // Filter vehicles by route
+            const routeVehicles = vehicles.filter(v => 
+                v.route_name?.toLowerCase().includes(routeName.toLowerCase())
+            );
+            if (routeVehicles.length > 0) {
+                const bounds = L.latLngBounds(routeVehicles.map(v => [v.lat, v.lon]));
+                map.fitBounds(bounds, { padding: [50, 50] });
+            }
+        }
+        
+        function filterMapByType(type) {
+            switchTab('map');
+            filterVehicles(type);
+        }
+
+        // ==========================================
+        // CROWDING INDICATORS
+        // ==========================================
+        
+        function getCrowdingLevel(vehicle) {
+            // Simulate crowding based on time of day and random factor
+            const hour = new Date().getHours();
+            const day = new Date().getDay();
+            
+            // Peak hours: 7-9am, 5-7pm on weekdays
+            const isPeak = (day >= 1 && day <= 5) && 
+                ((hour >= 7 && hour <= 9) || (hour >= 17 && hour <= 19));
+            
+            // Use vehicle ID to create consistent "random" factor
+            const hash = vehicle.id.split('').reduce((a, b) => a + b.charCodeAt(0), 0);
+            const randomFactor = (hash % 100) / 100;
+            
+            let probability;
+            if (isPeak) {
+                probability = 0.6 + (randomFactor * 0.3); // 60-90% chance of being busy
+            } else {
+                probability = 0.2 + (randomFactor * 0.3); // 20-50% chance of being busy
+            }
+            
+            if (probability > 0.8) return { level: 'busy', label: 'Busy', icon: 'fa-users', color: '#ef4444' };
+            if (probability > 0.5) return { level: 'moderate', label: 'Moderate', icon: 'fa-user-friends', color: '#f59e0b' };
+            return { level: 'quiet', label: 'Quiet', icon: 'fa-user', color: '#22c55e' };
+        }
+        
+        function renderCrowdingIndicator(vehicle) {
+            const crowding = getCrowdingLevel(vehicle);
+            return `
+                <span class="crowding-indicator ${crowding.level}">
+                    <i class="fas ${crowding.icon}"></i>
+                    ${crowding.label}
+                </span>
+            `;
+        }
+
+        // ==========================================
+        // FARE CALCULATOR
+        // ==========================================
+        
+        function calculateFare(fromStop, toStop) {
+            if (!fromStop || !toStop) return null;
+            
+            // Calculate distance
+            const distance = calculateDistance(fromStop.lat, fromStop.lon, toStop.lat, toStop.lon);
+            
+            // Determine zones (simplified)
+            let zones;
+            if (distance < 5) zones = 1;
+            else if (distance < 15) zones = 2;
+            else zones = 3;
+            
+            // Adelaide Metro fares (approximate)
+            const fares = {
+                1: { regular: 3.20, concession: 1.60 },
+                2: { regular: 4.40, concession: 2.20 },
+                3: { regular: 5.60, concession: 2.80 }
+            };
+            
+            const fare = fares[zones];
+            
+            return {
+                zones: zones,
+                regular: fare.regular,
+                concession: fare.concession,
+                distance: Math.round(distance * 10) / 10
+            };
+        }
+        
+        function renderFareDisplay(fromStop, toStop) {
+            const fare = calculateFare(fromStop, toStop);
+            if (!fare) return '';
+            
+            return `
+                <div class="fare-display">
+                    <div class="fare-type">
+                        <div class="fare-label">Regular (${fare.zones} zone${fare.zones > 1 ? 's' : ''})</div>
+                        <div class="fare-amount">$${fare.regular.toFixed(2)}</div>
+                    </div>
+                    <div class="fare-type">
+                        <div class="fare-label">Concession</div>
+                        <div class="fare-amount">$${fare.concession.toFixed(2)}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ==========================================
+        // NEXT DEPARTURES
+        // ==========================================
+        
+        async function fetchNextDepartures(stopName, limit = 3) {
+            try {
+                // Find stop ID from name
+                const stop = ADELAIDE_STOPS.find(s => s.n === stopName);
+                if (!stop) return [];
+                
+                // Fetch vehicles heading toward this stop
+                const res = await fetch('/adelaide-metro/api/vehicles');
+                const data = await res.json();
+                
+                const vehicles = (data.vehicles || [])
+                    .filter(v => v.next_stop?.toLowerCase().includes(stopName.toLowerCase()) ||
+                                  v.destination?.toLowerCase().includes(stopName.toLowerCase()))
+                    .slice(0, limit);
+                
+                return vehicles.map(v => ({
+                    route: v.route_name,
+                    destination: v.destination,
+                    minutes: v.arrival_minutes,
+                    type: v.type,
+                    id: v.id
+                }));
+            } catch (e) {
+                console.error('Failed to fetch next departures:', e);
+                return [];
+            }
+        }
+        
+        function renderNextDepartures(stopName, containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            fetchNextDepartures(stopName).then(departures => {
+                if (departures.length === 0) {
+                    container.innerHTML = '<div class="next-departures"><div class="next-departure-item">No upcoming departures</div></div>';
+                    return;
+                }
+                
+                container.innerHTML = `
+                    <div class="next-departures">
+                        <div style="font-size: 0.7rem; color: var(--text-muted); margin-bottom: 0.25rem;">Next departures:</div>
+                        ${departures.map(d => `
+                            <div class="next-departure-item" onclick="trackVehicle('${d.id}')" style="cursor: pointer;">
+                                <div class="next-departure-route">
+                                    <span style="color: ${d.type === 'train' ? '#3b82f6' : d.type === 'tram' ? '#06b6d4' : '#10b981'};">
+                                        <i class="fas ${d.type === 'train' ? 'fa-train' : d.type === 'tram' ? 'fa-subway' : 'fa-bus'}"></i>
+                                    </span>
+                                    <span>${d.route}</span>
+                                    <span style="color: var(--text-muted);">to ${d.destination}</span>
+                                </div>
+                                <div class="next-departure-time">${d.minutes} min</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            });
+        }
+
+        // ==========================================
         // THEME MANAGEMENT WITH AUTO DAY/NIGHT
         // ==========================================
         
@@ -5097,7 +5649,15 @@
                 html += `</div></div>`;
             });
             
-            html += `</div></div>`;
+            html += `</div>`;
+            
+            // Add fare display
+            const fareHtml = renderFareDisplay(fromStop, toStop);
+            if (fareHtml) {
+                html += fareHtml;
+            }
+            
+            html += `</div>`;
             container.innerHTML = html;
             
             // Auto-add to recent trips
@@ -5131,8 +5691,14 @@
             // Fetch alerts with enhanced handling
             await fetchAlertsEnhanced();
             
+            // Render line status
+            renderLineStatus();
+            
             // Set up alert polling
             setInterval(fetchAlertsEnhanced, 60000);
+            
+            // Update line status every 2 minutes
+            setInterval(renderLineStatus, 120000);
         };
 
         // Close modal on escape key
