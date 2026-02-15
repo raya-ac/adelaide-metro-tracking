@@ -4764,7 +4764,7 @@
             
             const tripData = JSON.parse(atob(currentQRData));
             const shareText = `Check out this trip on Adelaide Metro: ${tripData.from} to ${tripData.to}`;
-            const shareUrl = `${window.location.origin}/templates/adelaide-metro/index.html?trip=${encodeURIComponent(currentQRData)}`;
+            const shareUrl = `${window.location.origin}/adelaide-metro/?trip=${encodeURIComponent(currentQRData)}`;
             
             if (navigator.share) {
                 navigator.share({
