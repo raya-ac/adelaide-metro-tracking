@@ -1707,9 +1707,451 @@
         .leaflet-container {
             background: var(--bg-secondary);
         }
+
+        /* Offline Indicator */
+        .offline-indicator {
+            position: fixed;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--danger);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-xl);
+            font-size: 0.875rem;
+            font-weight: 600;
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: var(--shadow-lg);
+            animation: slideDown 0.3s ease;
+        }
+
+        .offline-indicator.visible {
+            display: flex;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
+        /* Favorites System */
+        .favorite-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1.25rem;
+            padding: 0.25rem;
+            transition: all 0.2s;
+        }
+
+        .favorite-btn:hover {
+            color: #f59e0b;
+            transform: scale(1.1);
+        }
+
+        .favorite-btn.active {
+            color: #f59e0b;
+        }
+
+        .favorite-btn.active i::before {
+            content: "\f005";
+        }
+
+        .favorites-section {
+            margin-top: 1.5rem;
+        }
+
+        .favorite-trip-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: var(--radius);
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .favorite-trip-item:hover {
+            border-color: #f59e0b;
+            background: rgba(245, 158, 11, 0.05);
+        }
+
+        .favorite-trip-route {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 500;
+        }
+
+        .favorite-trip-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .favorite-action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .favorite-action-btn:hover {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        /* QR Code Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 10001;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal-overlay.visible {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: var(--shadow-lg);
+            animation: modalIn 0.3s ease;
+        }
+
+        @keyframes modalIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .modal-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.25rem;
+            cursor: pointer;
+            padding: 0.25rem;
+        }
+
+        .modal-close:hover {
+            color: var(--text-primary);
+        }
+
+        .qr-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+        }
+
+        #qr-canvas {
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .qr-instructions {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .share-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--accent-gradient);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .share-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glow);
+        }
+
+        /* Service Alerts Section */
+        .alerts-section {
+            margin-top: 1.5rem;
+        }
+
+        .alert-history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .alert-history-item {
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: var(--radius);
+            border-left: 4px solid var(--warning);
+        }
+
+        .alert-history-item.critical {
+            border-left-color: var(--danger);
+        }
+
+        .alert-history-item.resolved {
+            border-left-color: var(--success);
+            opacity: 0.7;
+        }
+
+        .alert-history-date {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+
+        .alert-history-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .alert-history-desc {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .alerts-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--warning);
+            font-weight: 600;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: var(--radius);
+            transition: all 0.2s;
+        }
+
+        .alerts-toggle:hover {
+            background: rgba(245, 158, 11, 0.1);
+        }
+
+        /* High Contrast Mode */
+        [data-theme="high-contrast"] {
+            --bg-primary: #000000;
+            --bg-secondary: #000000;
+            --bg-tertiary: #1a1a1a;
+            --bg-glass: #000000;
+            --text-primary: #ffffff;
+            --text-secondary: #ffff00;
+            --text-muted: #cccccc;
+            --accent-primary: #00ffff;
+            --accent-secondary: #ff00ff;
+            --accent-gradient: linear-gradient(135deg, #00ffff 0%, #ff00ff 100%);
+            --success: #00ff00;
+            --warning: #ffff00;
+            --danger: #ff0000;
+            --info: #00ffff;
+            --train: #00ffff;
+            --tram: #ff00ff;
+            --bus: #00ff00;
+        }
+
+        [data-theme="high-contrast"] .vehicle-card,
+        [data-theme="high-contrast"] .card,
+        [data-theme="high-contrast"] .route-option,
+        [data-theme="high-contrast"] .stat-card {
+            border: 2px solid #ffffff;
+        }
+
+        [data-theme="high-contrast"] .vehicle-card:hover,
+        [data-theme="high-contrast"] .route-option:hover {
+            border-color: #00ffff;
+            outline: 2px solid #00ffff;
+            outline-offset: 2px;
+        }
+
+        /* Theme Toggle Dropdown */
+        .theme-dropdown {
+            position: relative;
+        }
+
+        .theme-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 0.5rem;
+            background: var(--bg-secondary);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: var(--radius);
+            padding: 0.5rem;
+            min-width: 180px;
+            display: none;
+            box-shadow: var(--shadow-lg);
+            z-index: 100;
+        }
+
+        .theme-menu.visible {
+            display: block;
+        }
+
+        .theme-option {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.625rem 1rem;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.875rem;
+        }
+
+        .theme-option:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .theme-option.active {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        /* Screen Reader Only */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* Live Region for Announcements */
+        .live-region {
+            position: fixed;
+            left: -10000px;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+        }
+
+        /* Focus styles for keyboard navigation */
+        button:focus-visible,
+        input:focus-visible,
+        a:focus-visible {
+            outline: 2px solid var(--accent-primary);
+            outline-offset: 2px;
+        }
+
+        /* Skip Link for Accessibility */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: var(--accent-primary);
+            color: white;
+            padding: 8px 16px;
+            z-index: 10002;
+            transition: top 0.3s;
+        }
+
+        .skip-link:focus {
+            top: 0;
+        }
+
+        /* Scan QR Button */
+        .scan-qr-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--bg-tertiary);
+            border: 2px dashed var(--accent-primary);
+            border-radius: var(--radius);
+            color: var(--text-primary);
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            transition: all 0.2s;
+        }
+
+        .scan-qr-btn:hover {
+            background: rgba(99, 102, 241, 0.1);
+        }
     </style>
 </head>
 <body>
+    <!-- Skip Link for Accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <!-- Live Region for Screen Reader Announcements -->
+    <div id="live-region" class="live-region" aria-live="polite" aria-atomic="true"></div>
+    
+    <!-- Offline Indicator -->
+    <div id="offline-indicator" class="offline-indicator" role="status" aria-live="polite">
+        <i class="fas fa-wifi-slash"></i>
+        <span>You're offline. Some features may be limited.</span>
+    </div>
+    
+    <!-- QR Code Modal -->
+    <div id="qr-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="qr-modal-title">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="qr-modal-title" class="modal-title">Share Trip</h2>
+                <button class="modal-close" onclick="closeQRModal()" aria-label="Close modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="qr-container">
+                <canvas id="qr-canvas" width="200" height="200"></canvas>
+                <p class="qr-instructions">Scan this code to load this trip on another device</p>
+                <button class="share-btn" onclick="shareTripNative()">
+                    <i class="fas fa-share-alt"></i>
+                    Share Trip
+                </button>
+            </div>
+        </div>
+    </div>
+    
     <div class="app">
         <!-- Header -->
         <header class="header">
@@ -1720,33 +2162,63 @@
                 <span class="brand-text">Metro Live</span>
             </div>
             <div class="header-actions">
-                <button class="icon-btn" id="theme-toggle" title="Toggle theme">
-                    <i class="fas fa-moon"></i>
-                </button>
-                <button class="icon-btn" id="refresh-btn" title="Refresh">
+                <div class="theme-dropdown">
+                    <button class="icon-btn" id="theme-toggle" title="Toggle theme" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <div class="theme-menu" id="theme-menu" role="menu">
+                        <div class="theme-option" data-theme="dark" role="menuitem">
+                            <i class="fas fa-moon"></i>
+                            <span>Dark Mode</span>
+                        </div>
+                        <div class="theme-option" data-theme="light" role="menuitem">
+                            <i class="fas fa-sun"></i>
+                            <span>Light Mode</span>
+                        </div>
+                        <div class="theme-option" data-theme="auto" role="menuitem">
+                            <i class="fas fa-clock"></i>
+                            <span>Auto (Day/Night)</span>
+                        </div>
+                        <div class="theme-option" data-theme="high-contrast" role="menuitem">
+                            <i class="fas fa-adjust"></i>
+                            <span>High Contrast</span>
+                        </div>
+                    </div>
+                </div>
+                <button class="icon-btn" id="refresh-btn" title="Refresh" aria-label="Refresh data">
                     <i class="fas fa-sync-alt"></i>
                 </button>
             </div>
         </header>
 
         <!-- Main Content -->
-        <main class="main-content">
+        <main class="main-content" id="main-content">
             <!-- Tab Navigation -->
-            <nav class="tab-nav">
-                <button class="tab-btn active" data-tab="nearby">
-                    <i class="fas fa-location-dot"></i>
+            <nav class="tab-nav" role="tablist" aria-label="Main navigation">
+                <button class="tab-btn active" data-tab="nearby" role="tab" aria-selected="true" aria-controls="nearby-panel" id="tab-nearby">
+                    <i class="fas fa-location-dot" aria-hidden="true"></i>
                     Nearby
                 </button>
-                <button class="tab-btn" data-tab="routes">
-                    <i class="fas fa-route"></i>
+                <button class="tab-btn" data-tab="favorites" role="tab" aria-selected="false" aria-controls="favorites-panel" id="tab-favorites">
+                    <i class="fas fa-star" aria-hidden="true"></i>
+                    Favorites
+                    <span class="badge" id="fav-count">0</span>
+                </button>
+                <button class="tab-btn" data-tab="routes" role="tab" aria-selected="false" aria-controls="routes-panel" id="tab-routes">
+                    <i class="fas fa-route" aria-hidden="true"></i>
                     Routes
                 </button>
-                <button class="tab-btn" data-tab="map">
-                    <i class="fas fa-map"></i>
+                <button class="tab-btn" data-tab="alerts" role="tab" aria-selected="false" aria-controls="alerts-panel" id="tab-alerts">
+                    <i class="fas fa-bell" aria-hidden="true"></i>
+                    Alerts
+                    <span class="badge" id="alert-count" style="display: none;">0</span>
+                </button>
+                <button class="tab-btn" data-tab="map" role="tab" aria-selected="false" aria-controls="map-panel" id="tab-map">
+                    <i class="fas fa-map" aria-hidden="true"></i>
                     Map
                 </button>
-                <button class="tab-btn" data-tab="plan">
-                    <i class="fas fa-compass"></i>
+                <button class="tab-btn" data-tab="plan" role="tab" aria-selected="false" aria-controls="plan-panel" id="tab-plan">
+                    <i class="fas fa-compass" aria-hidden="true"></i>
                     Plan
                 </button>
             </nav>
@@ -1754,17 +2226,17 @@
             <!-- Tab Content -->
             <div class="tab-content">
                 <!-- Nearby Tab -->
-                <div class="tab-panel active" id="nearby-panel">
+                <div class="tab-panel active" id="nearby-panel" role="tabpanel" aria-labelledby="tab-nearby">
                     <div class="search-container">
                         <div class="search-bar">
-                            <i class="fas fa-search"></i>
-                            <input type="text" id="search-input" placeholder="Search routes or stops...">
+                            <i class="fas fa-search" aria-hidden="true"></i>
+                            <input type="text" id="search-input" placeholder="Search routes or stops..." aria-label="Search routes or stops">
                         </div>
                     </div>
 
                     <!-- Alert Banner -->
-                    <div class="alert-banner" id="alert-banner" style="display: none;">
-                        <i class="fas fa-exclamation-triangle"></i>
+                    <div class="alert-banner" id="alert-banner" style="display: none;" role="alert" aria-live="polite">
+                        <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                         <div class="alert-content">
                             <div class="alert-title" id="alert-title">Service Alert</div>
                             <div class="alert-text" id="alert-text">Loading alerts...</div>
@@ -1802,6 +2274,30 @@
                     <div class="pull-hint" id="pull-hint">
                         <i class="fas fa-arrow-down"></i> Pull to refresh
                     </div>
+                </div>
+
+                <!-- Favorites Tab -->
+                <div class="tab-panel" id="favorites-panel" role="tabpanel" aria-labelledby="tab-favorites">
+                    <div class="favorites-section">
+                        <div class="section-header">
+                            <i class="fas fa-star" aria-hidden="true"></i>
+                            <span>Saved Trips</span>
+                        </div>
+                        <div id="favorites-list">
+                            <div class="empty-state">
+                                <div class="empty-icon"><i class="far fa-star"></i></div>
+                                <div class="empty-title">No saved trips</div>
+                                <div class="empty-text">Save your favorite trips by clicking the star icon when planning a route</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="scan-qr-btn" onclick="startQRScanner()">
+                        <i class="fas fa-qrcode"></i>
+                        Scan QR Code to Load Trip
+                    </button>
+                    
+                    <input type="file" id="qr-input" accept="image/*" style="display: none;" onchange="handleQRUpload(event)">
                 </div>
 
                 <!-- Routes Tab -->
@@ -1843,6 +2339,35 @@
                     </div>
                 </div>
 
+                <!-- Alerts Tab -->
+                <div class="tab-panel" id="alerts-panel" role="tabpanel" aria-labelledby="tab-alerts">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fas fa-bell" style="color: var(--warning);"></i>
+                                Active Service Alerts
+                            </div>
+                        </div>
+                        <div class="card-body" id="active-alerts">
+                            <div class="empty-state">
+                                <div class="empty-icon"><i class="fas fa-check-circle"></i></div>
+                                <div class="empty-title">No Active Alerts</div>
+                                <div class="empty-text">All services are running normally</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alerts-section">
+                        <div class="section-header">
+                            <i class="fas fa-history"></i>
+                            <span>Alert History</span>
+                        </div>
+                        <div class="alert-history-list" id="alert-history">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Map Tab -->
                 <div class="tab-panel" id="map-panel">
                     <div class="map-container">
@@ -1865,7 +2390,7 @@
                 </div>
 
                 <!-- Plan Tab -->
-                <div class="tab-panel" id="plan-panel">
+                <div class="tab-panel" id="plan-panel" role="tabpanel" aria-labelledby="tab-plan">
                     <div class="trip-planner-container">
                         <!-- Location Inputs -->
                         <div class="location-inputs-card">
@@ -2008,22 +2533,22 @@
         </main>
 
         <!-- Bottom Navigation (Mobile) -->
-        <nav class="bottom-nav">
+        <nav class="bottom-nav" aria-label="Mobile navigation">
             <div class="bottom-nav-items">
-                <a href="#" class="bottom-nav-item active" data-tab="nearby">
-                    <i class="fas fa-location-dot"></i>
+                <a href="#" class="bottom-nav-item active" data-tab="nearby" aria-label="Nearby stops">
+                    <i class="fas fa-location-dot" aria-hidden="true"></i>
                     Nearby
                 </a>
-                <a href="#" class="bottom-nav-item" data-tab="routes">
-                    <i class="fas fa-route"></i>
-                    Routes
+                <a href="#" class="bottom-nav-item" data-tab="favorites" aria-label="Favorite trips">
+                    <i class="fas fa-star" aria-hidden="true"></i>
+                    Favorites
                 </a>
-                <a href="#" class="bottom-nav-item" data-tab="map">
-                    <i class="fas fa-map"></i>
+                <a href="#" class="bottom-nav-item" data-tab="map" aria-label="Map view">
+                    <i class="fas fa-map" aria-hidden="true"></i>
                     Map
                 </a>
-                <a href="#" class="bottom-nav-item" data-tab="plan">
-                    <i class="fas fa-compass"></i>
+                <a href="#" class="bottom-nav-item" data-tab="plan" aria-label="Plan trip">
+                    <i class="fas fa-compass" aria-hidden="true"></i>
                     Plan
                 </a>
             </div>
@@ -2031,6 +2556,7 @@
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="/templates/adelaide-metro/qrcode.js"></script>
     <script src="/static/adelaide-metro-stops.js"></script>
     <script>
         // State
@@ -3388,10 +3914,21 @@
             const statusEl = document.getElementById('journey-vehicle-status');
             const vehiclesList = document.getElementById('journey-vehicles-list');
             
+            console.log('updateJourneyMapVehicles called with:', fromStop, toStop);
+            
+            // Validate fromStop
+            if (!fromStop || !fromStop.lat || !fromStop.lon) {
+                console.error('Invalid fromStop:', fromStop);
+                statusEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> Invalid starting location';
+                return;
+            }
+            
             try {
                 const res = await fetch('/adelaide-metro/api/vehicles');
                 const data = await res.json();
                 const vehicles = data.vehicles || [];
+                
+                console.log('Total vehicles:', vehicles.length);
                 
                 if (vehicles.length === 0) {
                     statusEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> No vehicle data available';
@@ -3399,46 +3936,40 @@
                     return;
                 }
                 
-                // Find vehicles near our route (within 5km of either stop)
-                let relevantVehicles = vehicles.filter(v => {
-                    const distFrom = calculateDistance(fromStop.lat, fromStop.lon, v.lat, v.lon);
-                    const distTo = calculateDistance(toStop.lat, toStop.lon, v.lat, v.lon);
-                    return distFrom < 5 || distTo < 5;
-                });
+                // Filter vehicles - use distance only, simpler approach
+                let relevantVehicles = vehicles
+                    .filter(v => v.lat != null && v.lon != null) // Must have coordinates
+                    .map(v => ({
+                        ...v,
+                        distFrom: calculateDistance(fromStop.lat, fromStop.lon, v.lat, v.lon)
+                    }))
+                    .filter(v => v.distFrom < 50) // Within 50km
+                    .sort((a, b) => a.distFrom - b.distFrom)
+                    .slice(0, 3);
                 
-                // If no vehicles within 5km, show the closest ones anyway
-                if (relevantVehicles.length === 0) {
-                    // Sort all vehicles by distance to fromStop
-                    relevantVehicles = vehicles
-                        .map(v => ({
-                            ...v,
-                            distFrom: calculateDistance(fromStop.lat, fromStop.lon, v.lat, v.lon)
-                        }))
-                        .sort((a, b) => a.distFrom - b.distFrom)
-                        .slice(0, 3);
-                }
+                console.log('Found', relevantVehicles.length, 'vehicles within 50km');
                 
                 if (relevantVehicles.length === 0) {
+                    // Show all vehicles for debugging
+                    const allVehicles = vehicles.slice(0, 5).map(v => ({
+                        id: v.id,
+                        route: v.route_name,
+                        lat: v.lat,
+                        lon: v.lon,
+                        dist: v.lat && v.lon ? calculateDistance(fromStop.lat, fromStop.lon, v.lat, v.lon) : 'no coords'
+                    }));
+                    console.log('All vehicles (first 5):', allVehicles);
+                    
                     statusEl.innerHTML = '<i class="fas fa-info-circle"></i> No vehicles currently nearby. Check again shortly.';
                     vehiclesList.innerHTML = '<div style="text-align: center; padding: 1rem; color: var(--text-muted);">No live vehicles on this route right now</div>';
                     return;
                 }
                 
-                // Sort by distance to fromStop
-                relevantVehicles.sort((a, b) => {
-                    const distA = calculateDistance(fromStop.lat, fromStop.lon, a.lat, a.lon);
-                    const distB = calculateDistance(fromStop.lat, fromStop.lon, b.lat, b.lon);
-                    return distA - distB;
-                });
-                
                 const nearest = relevantVehicles[0];
-                const dist = calculateDistance(fromStop.lat, fromStop.lon, nearest.lat, nearest.lon);
+                const dist = nearest.distFrom;
                 const stopsAway = Math.max(1, Math.ceil(dist * 2));
                 
-                // Check if this is a fallback (vehicles > 5km away)
-                const isFallback = dist >= 5;
-                
-                if (isFallback) {
+                if (dist >= 5) {
                     statusEl.innerHTML = `
                         <div style="display: flex; align-items: center; gap: 0.5rem;">
                             <div class="live-indicator"></div>
@@ -3496,11 +4027,11 @@
                     }
                 });
                 
-                // Update vehicle cards list
+                // Update vehicle cards list - use pre-calculated distance
                 vehiclesList.innerHTML = relevantVehicles.map(v => {
                     const color = v.type === 'train' ? '#3b82f6' : v.type === 'tram' ? '#06b6d4' : '#10b981';
                     const icon = v.type === 'train' ? 'fa-train' : v.type === 'tram' ? 'fa-subway' : 'fa-bus';
-                    const dist = calculateDistance(fromStop.lat, fromStop.lon, v.lat, v.lon);
+                    const dist = v.distFrom;
                     const stopsAway = Math.max(1, Math.ceil(dist * 2));
                     
                     return `
@@ -3628,28 +4159,19 @@
                 // Validate from stop data
                 if (!from || !from.lat || !from.lon) return;
                 
-                // Find nearest vehicle (within 5km, or closest available)
-                let relevantVehicles = vehicles.filter(v => {
-                    const distFrom = calculateDistance(from.lat, from.lon, v.lat, v.lon);
-                    return distFrom < 5;
-                });
-                
-                // If none within 5km, get closest
-                if (relevantVehicles.length === 0) {
-                    relevantVehicles = vehicles
-                        .map(v => ({...v, dist: calculateDistance(from.lat, from.lon, v.lat, v.lon)}))
-                        .sort((a, b) => a.dist - b.dist)
-                        .slice(0, 1);
-                }
+                // Find nearest vehicle (within 50km)
+                let relevantVehicles = vehicles
+                    .filter(v => v.lat != null && v.lon != null)
+                    .map(v => ({
+                        ...v,
+                        dist: calculateDistance(from.lat, from.lon, v.lat, v.lon)
+                    }))
+                    .filter(v => v.dist < 50)
+                    .sort((a, b) => a.dist - b.dist);
                 
                 if (relevantVehicles.length === 0) return;
                 
-                const nearest = relevantVehicles.sort((a, b) => {
-                    const distA = calculateDistance(from.lat, from.lon, a.lat, a.lon);
-                    const distB = calculateDistance(from.lat, from.lon, b.lat, b.lon);
-                    return distA - distB;
-                })[0];
-                
+                const nearest = relevantVehicles[0];
                 const arrivalMinutes = nearest.arrival_minutes;
                 
                 // Send notifications at key times
@@ -3759,6 +4281,747 @@
         });
 
         document.addEventListener('DOMContentLoaded', init);
+
+        // ==========================================
+        // SERVICE WORKER REGISTRATION (Offline Support)
+        // ==========================================
+        
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', async () => {
+                try {
+                    const registration = await navigator.serviceWorker.register('/templates/adelaide-metro/sw.js');
+                    console.log('[SW] Registered:', registration.scope);
+                    
+                    // Check for updates
+                    registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                // New version available
+                                console.log('[SW] New version available');
+                            }
+                        });
+                    });
+                } catch (err) {
+                    console.log('[SW] Registration failed:', err);
+                }
+            });
+        }
+
+        // ==========================================
+        // OFFLINE DETECTION
+        // ==========================================
+        
+        function initOfflineDetection() {
+            const offlineIndicator = document.getElementById('offline-indicator');
+            
+            function updateOnlineStatus() {
+                if (navigator.onLine) {
+                    offlineIndicator.classList.remove('visible');
+                    announceToScreenReader('You are back online');
+                } else {
+                    offlineIndicator.classList.add('visible');
+                    announceToScreenReader('You are offline. Some features may be limited.');
+                }
+            }
+            
+            window.addEventListener('online', updateOnlineStatus);
+            window.addEventListener('offline', updateOnlineStatus);
+            
+            // Initial check
+            if (!navigator.onLine) {
+                offlineIndicator.classList.add('visible');
+            }
+        }
+
+        // ==========================================
+        // SCREEN READER ANNOUNCEMENTS
+        // ==========================================
+        
+        function announceToScreenReader(message) {
+            const liveRegion = document.getElementById('live-region');
+            if (liveRegion) {
+                liveRegion.textContent = message;
+                // Clear after announcement
+                setTimeout(() => {
+                    liveRegion.textContent = '';
+                }, 1000);
+            }
+        }
+
+        // ==========================================
+        // FAVORITES SYSTEM
+        // ==========================================
+        
+        const FAVORITES_KEY = 'adelaideMetroFavorites';
+        
+        function getFavorites() {
+            try {
+                return JSON.parse(localStorage.getItem(FAVORITES_KEY)) || [];
+            } catch (e) {
+                return [];
+            }
+        }
+        
+        function saveFavorites(favorites) {
+            localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
+            updateFavoritesCount();
+        }
+        
+        function addFavorite(from, to, fromLat, fromLon, toLat, toLon) {
+            const favorites = getFavorites();
+            const exists = favorites.some(f => f.from === from && f.to === to);
+            
+            if (!exists) {
+                favorites.push({
+                    from,
+                    to,
+                    fromLat,
+                    fromLon,
+                    toLat,
+                    toLon,
+                    timestamp: Date.now(),
+                    id: Date.now().toString(36) + Math.random().toString(36).substr(2)
+                });
+                saveFavorites(favorites);
+                announceToScreenReader(`Trip from ${from} to ${to} added to favorites`);
+                return true;
+            }
+            return false;
+        }
+        
+        function removeFavorite(id) {
+            let favorites = getFavorites();
+            const removed = favorites.find(f => f.id === id);
+            favorites = favorites.filter(f => f.id !== id);
+            saveFavorites(favorites);
+            if (removed) {
+                announceToScreenReader(`Trip from ${removed.from} to ${removed.to} removed from favorites`);
+            }
+            renderFavorites();
+        }
+        
+        function isFavorite(from, to) {
+            return getFavorites().some(f => f.from === from && f.to === to);
+        }
+        
+        function updateFavoritesCount() {
+            const count = getFavorites().length;
+            const badge = document.getElementById('fav-count');
+            if (badge) {
+                badge.textContent = count;
+                badge.style.display = count > 0 ? 'inline-block' : 'none';
+            }
+        }
+        
+        function renderFavorites() {
+            const container = document.getElementById('favorites-list');
+            const favorites = getFavorites();
+            
+            if (favorites.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon"><i class="far fa-star"></i></div>
+                        <div class="empty-title">No saved trips</div>
+                        <div class="empty-text">Save your favorite trips by clicking the star icon when planning a route</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = favorites.map(fav => `
+                <div class="favorite-trip-item" tabindex="0" role="button" aria-label="Trip from ${fav.from} to ${fav.to}"
+                    onclick="loadFavoriteTrip('${fav.id}')"
+                    onkeydown="if(event.key==='Enter'||event.key===' ') loadFavoriteTrip('${fav.id}')">
+                    <div class="favorite-trip-route">
+                        <i class="fas fa-star" style="color: #f59e0b;"></i>
+                        <span>${fav.from} <i class="fas fa-arrow-right"></i> ${fav.to}</span>
+                    </div>
+                    <div class="favorite-trip-actions">
+                        <button class="favorite-action-btn" onclick="event.stopPropagation(); shareFavoriteTrip('${fav.id}')" 
+                            title="Share trip" aria-label="Share trip from ${fav.from} to ${fav.to}">
+                            <i class="fas fa-share-alt"></i>
+                        </button>
+                        <button class="favorite-action-btn" onclick="event.stopPropagation(); removeFavorite('${fav.id}')" 
+                            title="Remove from favorites" aria-label="Remove trip from favorites">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function loadFavoriteTrip(id) {
+            const favorite = getFavorites().find(f => f.id === id);
+            if (!favorite) return;
+            
+            document.getElementById('trip-from').value = favorite.from;
+            document.getElementById('trip-to').value = favorite.to;
+            
+            if (favorite.fromLat) {
+                document.getElementById('trip-from').dataset.lat = favorite.fromLat;
+                document.getElementById('trip-from').dataset.lon = favorite.fromLon;
+            }
+            if (favorite.toLat) {
+                document.getElementById('trip-to').dataset.lat = favorite.toLat;
+                document.getElementById('trip-to').dataset.lon = favorite.toLon;
+            }
+            
+            switchTab('plan');
+            planTrip();
+            announceToScreenReader(`Loading favorite trip from ${favorite.from} to ${favorite.to}`);
+        }
+        
+        function shareFavoriteTrip(id) {
+            const favorite = getFavorites().find(f => f.id === id);
+            if (!favorite) return;
+            showQRModal(favorite.from, favorite.to);
+        }
+        
+        function toggleFavoriteFromRoute() {
+            const fromInput = document.getElementById('trip-from');
+            const toInput = document.getElementById('trip-to');
+            const from = fromInput.value;
+            const to = toInput.value;
+            
+            if (!from || !to) return;
+            
+            const favorites = getFavorites();
+            const existingIndex = favorites.findIndex(f => f.from === from && f.to === to);
+            
+            if (existingIndex >= 0) {
+                // Remove
+                favorites.splice(existingIndex, 1);
+                saveFavorites(favorites);
+                updateFavoriteButtonState(false);
+                announceToScreenReader('Removed from favorites');
+            } else {
+                // Add
+                const fromStop = ADELAIDE_STOPS.find(s => s.n === from);
+                const toStop = ADELAIDE_STOPS.find(s => s.n === to);
+                addFavorite(
+                    from, to,
+                    fromStop?.lat, fromStop?.lon,
+                    toStop?.lat, toStop?.lon
+                );
+                updateFavoriteButtonState(true);
+            }
+            renderFavorites();
+        }
+        
+        function updateFavoriteButtonState(isFav) {
+            const btn = document.getElementById('route-favorite-btn');
+            if (btn) {
+                btn.classList.toggle('active', isFav);
+                btn.setAttribute('aria-label', isFav ? 'Remove from favorites' : 'Add to favorites');
+            }
+        }
+
+        // ==========================================
+        // THEME MANAGEMENT WITH AUTO DAY/NIGHT
+        // ==========================================
+        
+        // Adelaide coordinates for sunrise/sunset calculation
+        const ADELAIDE_LAT = -34.9285;
+        const ADELAIDE_LON = 138.6007;
+        
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'auto';
+            applyTheme(savedTheme);
+            initThemeMenu();
+            
+            // Listen for system theme changes
+            if (window.matchMedia) {
+                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+                    const currentTheme = localStorage.getItem('theme') || 'auto';
+                    if (currentTheme === 'auto') {
+                        applyTheme('auto');
+                    }
+                });
+            }
+            
+            // Check theme every minute for auto day/night
+            setInterval(() => {
+                const currentTheme = localStorage.getItem('theme') || 'auto';
+                if (currentTheme === 'auto') {
+                    applyTheme('auto');
+                }
+            }, 60000);
+        }
+        
+        function applyTheme(theme) {
+            const html = document.documentElement;
+            const themeMenu = document.getElementById('theme-menu');
+            
+            // Update menu selection
+            if (themeMenu) {
+                themeMenu.querySelectorAll('.theme-option').forEach(opt => {
+                    opt.classList.toggle('active', opt.dataset.theme === theme);
+                });
+            }
+            
+            if (theme === 'auto') {
+                const isDark = shouldUseDarkMode();
+                html.setAttribute('data-theme', isDark ? 'dark' : 'light');
+            } else {
+                html.setAttribute('data-theme', theme);
+            }
+            
+            updateThemeIcon(theme);
+        }
+        
+        function shouldUseDarkMode() {
+            // Check if system prefers dark mode
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                return true;
+            }
+            
+            // Calculate sunrise/sunset for Adelaide
+            const now = new Date();
+            const hours = now.getHours();
+            
+            // Simple approximation: dark mode from 6 PM to 6 AM
+            // Could be enhanced with actual sunrise/sunset calculation
+            return hours < 6 || hours >= 18;
+        }
+        
+        function initThemeMenu() {
+            const toggle = document.getElementById('theme-toggle');
+            const menu = document.getElementById('theme-menu');
+            
+            if (!toggle || !menu) return;
+            
+            toggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isVisible = menu.classList.toggle('visible');
+                toggle.setAttribute('aria-expanded', isVisible);
+            });
+            
+            menu.querySelectorAll('.theme-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    const theme = option.dataset.theme;
+                    localStorage.setItem('theme', theme);
+                    applyTheme(theme);
+                    menu.classList.remove('visible');
+                    toggle.setAttribute('aria-expanded', 'false');
+                    announceToScreenReader(`Theme changed to ${theme}`);
+                });
+            });
+            
+            // Close menu when clicking outside
+            document.addEventListener('click', () => {
+                menu.classList.remove('visible');
+                toggle.setAttribute('aria-expanded', 'false');
+            });
+        }
+        
+        function updateThemeIcon(theme) {
+            const btn = document.getElementById('theme-toggle');
+            if (!btn) return;
+            
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            
+            let iconClass = 'fa-moon';
+            if (currentTheme === 'light') iconClass = 'fa-sun';
+            else if (currentTheme === 'high-contrast') iconClass = 'fa-adjust';
+            
+            btn.innerHTML = `<i class="fas ${iconClass}"></i>`;
+        }
+
+        // ==========================================
+        // QR CODE SHARING
+        // ==========================================
+        
+        let currentQRData = null;
+        
+        function showQRModal(from, to) {
+            const modal = document.getElementById('qr-modal');
+            const canvas = document.getElementById('qr-canvas');
+            
+            // Create trip data
+            const tripData = {
+                from: from,
+                to: to,
+                timestamp: Date.now(),
+                version: '1.0'
+            };
+            
+            currentQRData = btoa(JSON.stringify(tripData));
+            
+            // Generate QR code
+            const qr = new QRCode(currentQRData);
+            qr.toCanvas(canvas);
+            
+            modal.classList.add('visible');
+            announceToScreenReader('QR code modal opened. Share this code to load the trip on another device.');
+        }
+        
+        function closeQRModal() {
+            const modal = document.getElementById('qr-modal');
+            modal.classList.remove('visible');
+            currentQRData = null;
+        }
+        
+        function shareTripNative() {
+            if (!currentQRData) return;
+            
+            const tripData = JSON.parse(atob(currentQRData));
+            const shareText = `Check out this trip on Adelaide Metro: ${tripData.from} to ${tripData.to}`;
+            const shareUrl = `${window.location.origin}/templates/adelaide-metro/index.html?trip=${encodeURIComponent(currentQRData)}`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Adelaide Metro Trip',
+                    text: shareText,
+                    url: shareUrl
+                });
+            } else {
+                // Fallback: copy to clipboard
+                navigator.clipboard.writeText(shareUrl).then(() => {
+                    announceToScreenReader('Trip link copied to clipboard');
+                    alert('Trip link copied to clipboard!');
+                });
+            }
+        }
+        
+        function startQRScanner() {
+            // Simple file input approach for QR scanning
+            document.getElementById('qr-input').click();
+        }
+        
+        function handleQRUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                // For simplicity, we'll parse URL parameters instead of actual QR scanning
+                // In a production app, you'd use a QR code scanning library
+                announceToScreenReader('Image received. Processing...');
+                alert('Please use the share link or scan with your camera app');
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        // Check for shared trip in URL
+        function checkForSharedTrip() {
+            const params = new URLSearchParams(window.location.search);
+            const tripData = params.get('trip');
+            
+            if (tripData) {
+                try {
+                    const trip = JSON.parse(atob(decodeURIComponent(tripData)));
+                    document.getElementById('trip-from').value = trip.from;
+                    document.getElementById('trip-to').value = trip.to;
+                    switchTab('plan');
+                    planTrip();
+                    announceToScreenReader(`Shared trip loaded: ${trip.from} to ${trip.to}`);
+                    
+                    // Clear URL parameter
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                } catch (e) {
+                    console.error('Invalid trip data:', e);
+                }
+            }
+        }
+
+        // ==========================================
+        // SERVICE ALERTS
+        // ==========================================
+        
+        let alertHistory = [];
+        const ALERTS_KEY = 'adelaideMetroAlertHistory';
+        
+        function loadAlertHistory() {
+            try {
+                const stored = localStorage.getItem(ALERTS_KEY);
+                if (stored) {
+                    alertHistory = JSON.parse(stored);
+                }
+            } catch (e) {
+                alertHistory = [];
+            }
+        }
+        
+        function saveAlertHistory() {
+            // Keep only last 50 alerts
+            const trimmed = alertHistory.slice(-50);
+            localStorage.setItem(ALERTS_KEY, JSON.stringify(trimmed));
+        }
+        
+        function addAlertToHistory(alert) {
+            alertHistory.push({
+                ...alert,
+                seenAt: Date.now()
+            });
+            saveAlertHistory();
+            renderAlertHistory();
+        }
+        
+        async function fetchAlertsEnhanced() {
+            try {
+                const res = await fetch('/adelaide-metro/api/alerts');
+                const data = await res.json();
+                const alerts = data.alerts || [];
+                
+                // Update active alerts
+                const activeAlerts = alerts.filter(a => a.active);
+                
+                // Update alert badge
+                const alertBadge = document.getElementById('alert-count');
+                if (alertBadge) {
+                    alertBadge.textContent = activeAlerts.length;
+                    alertBadge.style.display = activeAlerts.length > 0 ? 'inline-block' : 'none';
+                }
+                
+                // Show banner for first active alert
+                const banner = document.getElementById('alert-banner');
+                const bannerTitle = document.getElementById('alert-title');
+                const bannerText = document.getElementById('alert-text');
+                
+                if (activeAlerts.length > 0) {
+                    const alert = activeAlerts[0];
+                    banner.style.display = 'flex';
+                    bannerTitle.textContent = alert.title;
+                    bannerText.textContent = alert.description;
+                    
+                    // Add to history if new
+                    const isNew = !alertHistory.some(h => h.id === alert.id);
+                    if (isNew) {
+                        addAlertToHistory(alert);
+                    }
+                } else {
+                    banner.style.display = 'none';
+                }
+                
+                // Update active alerts panel
+                renderActiveAlerts(activeAlerts);
+                
+            } catch (err) {
+                console.error('Failed to fetch alerts:', err);
+            }
+        }
+        
+        function renderActiveAlerts(alerts) {
+            const container = document.getElementById('active-alerts');
+            
+            if (alerts.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon"><i class="fas fa-check-circle"></i></div>
+                        <div class="empty-title">No Active Alerts</div>
+                        <div class="empty-text">All services are running normally</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = alerts.map(alert => `
+                <div class="alert-history-item ${alert.severity === 'critical' ? 'critical' : ''}">
+                    <div class="alert-history-date">${formatAlertDate(alert.timestamp)}</div>
+                    <div class="alert-history-title">${alert.title}</div>
+                    <div class="alert-history-desc">${alert.description}</div>
+                    ${alert.affectedRoutes ? `<div style="margin-top: 0.5rem; font-size: 0.75rem; color: var(--text-muted);">
+                        <i class="fas fa-route"></i> Affected: ${alert.affectedRoutes.join(', ')}
+                    </div>` : ''}
+                </div>
+            `).join('');
+        }
+        
+        function renderAlertHistory() {
+            const container = document.getElementById('alert-history');
+            
+            if (alertHistory.length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 2rem; color: var(--text-muted);">No alert history</div>';
+                return;
+            }
+            
+            // Sort by date, newest first
+            const sorted = [...alertHistory].sort((a, b) => b.seenAt - a.seenAt);
+            
+            container.innerHTML = sorted.map(alert => `
+                <div class="alert-history-item ${alert.severity === 'critical' ? 'critical' : ''} ${!alert.active ? 'resolved' : ''}">
+                    <div class="alert-history-date">${formatAlertDate(alert.seenAt)} ${!alert.active ? '• Resolved' : ''}</div>
+                    <div class="alert-history-title">${alert.title}</div>
+                    <div class="alert-history-desc">${alert.description}</div>
+                </div>
+            `).join('');
+        }
+        
+        function formatAlertDate(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diff = now - date;
+            
+            // Less than 24 hours
+            if (diff < 24 * 60 * 60 * 1000) {
+                const hours = Math.floor(diff / (60 * 60 * 1000));
+                if (hours < 1) {
+                    const mins = Math.floor(diff / (60 * 1000));
+                    return mins < 1 ? 'Just now' : `${mins} min ago`;
+                }
+                return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+            }
+            
+            return date.toLocaleDateString('en-AU', { 
+                day: 'numeric', 
+                month: 'short',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // ==========================================
+        // ENHANCED RENDER TRIP RESULTS (with share/favorite)
+        // ==========================================
+        
+        // Override the existing renderTripResults function
+        const originalRenderTripResults = renderTripResults;
+        renderTripResults = function(container, routes, fromStop, toStop) {
+            const currentTime = getAdelaideTime();
+            const isFav = isFavorite(fromStop.n, toStop.n);
+            
+            let html = `<div class="trip-results-container">
+                <div class="trip-header">
+                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+                        <div class="trip-route-title">${fromStop.n} <i class="fas fa-arrow-right"></i> ${toStop.n}</div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="favorite-btn ${isFav ? 'active' : ''}" id="route-favorite-btn" 
+                                onclick="toggleFavoriteFromRoute()" 
+                                aria-label="${isFav ? 'Remove from favorites' : 'Add to favorites'}"
+                                title="${isFav ? 'Remove from favorites' : 'Add to favorites'}">
+                                <i class="${isFav ? 'fas' : 'far'} fa-star"></i>
+                            </button>
+                            <button class="favorite-btn" onclick="showQRModal('${fromStop.n.replace(/'/g, "\\'")}', '${toStop.n.replace(/'/g, "\\'")}')" 
+                                aria-label="Share trip via QR code"
+                                title="Share trip">
+                                <i class="fas fa-share-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="trip-current-time">Leaving now: ${currentTime}</div>
+                </div>
+                <div id="journey-status" class="journey-status" style="display: none;"></div>
+                <div class="route-options">`;
+            
+            routes.forEach((route, index) => {
+                const isRecommended = index === 0;
+                const badge = isRecommended ? '<span class="route-badge recommended">Best</span>' : '';
+                const totalTime = route.totalTime;
+                const hours = Math.floor(totalTime / 60);
+                const mins = totalTime % 60;
+                const timeText = hours > 0 ? `${hours}h ${mins}m` : `${mins} min`;
+                
+                html += `
+                    <div class="route-option ${isRecommended ? 'recommended' : ''}">
+                        <div class="route-option-header">
+                            <div class="route-option-main">
+                                ${badge}
+                                <div class="route-total-time">${timeText}</div>
+                                <div class="route-details">
+                                    ${route.transfers > 0 ? `<span class="route-transfers"><i class="fas fa-exchange-alt"></i> ${route.transfers} transfer${route.transfers > 1 ? 's' : ''}</span>` : '<span class="route-direct"><i class="fas fa-check"></i> Direct</span>'}
+                                    ${route.walkingDistance > 0 ? `<span class="route-walking"><i class="fas fa-walking"></i> ${Math.round(route.walkingDistance)}m walk</span>` : ''}
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center;">
+                                <button class="track-route-btn" onclick="trackThisRoute(${index})">
+                                    <i class="fas fa-map-marked-alt"></i> Track
+                                </button>
+                                <button class="route-expand-btn" onclick="toggleRoute(${index})" aria-label="Toggle route details">
+                                    <i class="fas fa-chevron-down" id="route-icon-${index}"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="route-legs" id="route-legs-${index}" style="${isRecommended ? '' : 'display:none;'}">`;
+                
+                route.legs.forEach((leg, legIndex) => {
+                    if (leg.type === 'walk') {
+                        html += `
+                            <div class="route-leg walk-leg">
+                                <div class="leg-icon walk"><i class="fas fa-walking"></i></div>
+                                <div class="leg-content">
+                                    <div class="leg-title">Walk ${Math.round(leg.distance)}m</div>
+                                    <div class="leg-detail">${leg.from} <i class="fas fa-arrow-right"></i> ${leg.to}</div>
+                                    <div class="leg-time">${leg.duration} min</div>
+                                </div>
+                            </div>`;
+                    } else {
+                        html += `
+                            <div class="route-leg transit-leg">
+                                <div class="leg-icon" style="background: ${leg.color}"><i class="fas ${leg.icon}"></i></div>
+                                <div class="leg-content">
+                                    <div class="leg-title">${leg.route}</div>
+                                    <div class="leg-detail">${leg.from} <i class="fas fa-arrow-right"></i> ${leg.to}</div>
+                                    <div class="leg-time">
+                                        <span class="departure-time">${leg.departure}</span>
+                                        <i class="fas fa-long-arrow-alt-right"></i>
+                                        <span class="arrival-time">${leg.arrival}</span>
+                                        <span class="duration">(${leg.duration} min)</span>
+                                    </div>
+                                </div>
+                            </div>`;
+                    }
+                    
+                    if (legIndex < route.legs.length - 1 && route.legs[legIndex + 1].type === 'transit') {
+                        html += `<div class="transfer-indicator"><i class="fas fa-exchange-alt"></i> Transfer</div>`;
+                    }
+                });
+                
+                html += `</div></div>`;
+            });
+            
+            html += `</div></div>`;
+            container.innerHTML = html;
+            
+            // Auto-add to recent trips
+            saveRecentTrip(fromStop.n, toStop.n);
+        };
+
+        // ==========================================
+        // INITIALIZE NEW FEATURES
+        // ==========================================
+        
+        // Override init function to include new features
+        const originalInit = init;
+        init = async function() {
+            // Initialize offline detection
+            initOfflineDetection();
+            
+            // Initialize theme with auto support
+            initTheme();
+            
+            // Load favorites and alert history
+            loadAlertHistory();
+            updateFavoritesCount();
+            renderFavorites();
+            
+            // Check for shared trip in URL
+            checkForSharedTrip();
+            
+            // Call original init
+            await originalInit();
+            
+            // Fetch alerts with enhanced handling
+            await fetchAlertsEnhanced();
+            
+            // Set up alert polling
+            setInterval(fetchAlertsEnhanced, 60000);
+        };
+
+        // Close modal on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeQRModal();
+            }
+        });
+
+        // Close modal on overlay click
+        document.getElementById('qr-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'qr-modal') {
+                closeQRModal();
+            }
+        });
     </script>
     <script src="/static/adelaide-metro-enhanced.js"></script>
 </body>
