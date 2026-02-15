@@ -4805,13 +4805,38 @@
             const params = new URLSearchParams(window.location.search);
             const tripData = params.get('trip');
             
+            console.log('Checking for shared trip. URL:', window.location.href);
+            console.log('Trip data:', tripData);
+            
             if (tripData) {
                 try {
-                    const trip = JSON.parse(atob(decodeURIComponent(tripData)));
-                    document.getElementById('trip-from').value = trip.from;
-                    document.getElementById('trip-to').value = trip.to;
+                    const decoded = decodeURIComponent(tripData);
+                    console.log('Decoded:', decoded);
+                    const trip = JSON.parse(atob(decoded));
+                    console.log('Parsed trip:', trip);
+                    
+                    const fromInput = document.getElementById('trip-from');
+                    const toInput = document.getElementById('trip-to');
+                    
+                    if (!fromInput || !toInput) {
+                        console.error('Trip inputs not found in DOM');
+                        return;
+                    }
+                    
+                    fromInput.value = trip.from;
+                    toInput.value = trip.to;
+                    
+                    // Trigger input events for autocomplete
+                    fromInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    toInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    
                     switchTab('plan');
-                    planTrip();
+                    
+                    // Small delay to let tab switch complete
+                    setTimeout(() => {
+                        planTrip();
+                    }, 100);
+                    
                     announceToScreenReader(`Shared trip loaded: ${trip.from} to ${trip.to}`);
                     
                     // Clear URL parameter
@@ -4819,6 +4844,8 @@
                 } catch (e) {
                     console.error('Invalid trip data:', e);
                 }
+            } else {
+                console.log('No trip data in URL');
             }
         }
 
@@ -5095,11 +5122,11 @@
             updateFavoritesCount();
             renderFavorites();
             
-            // Check for shared trip in URL
-            checkForSharedTrip();
-            
             // Call original init
             await originalInit();
+            
+            // Check for shared trip in URL after init completes
+            checkForSharedTrip();
             
             // Fetch alerts with enhanced handling
             await fetchAlertsEnhanced();
