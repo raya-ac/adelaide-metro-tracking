@@ -67,6 +67,31 @@ Real-time public transport tracking for Adelaide, Australia. Track buses, trains
 - Visual severity indicators
 - Badge notifications for active alerts
 
+### 🚦 Line Status Page
+- Overview of all train lines (Belair, Seaford, Gawler, Flinders, Outer Harbor, Grange, Tonsley)
+- Tram lines (Glenelg, Botanic, Entertainment Centre)
+- Bus network status
+- Color-coded status indicators (Good/Delayed/Disrupted)
+- Click any line to filter the map
+
+### 🕐 Next Departures
+- Shows next 3 upcoming departures from nearby stops
+- Route name, destination, and ETA
+- Real-time countdown
+- One-click to track specific departure
+
+### 👥 Crowding Indicators
+- Real-time occupancy levels (Quiet/Moderate/Busy)
+- Color-coded (green/yellow/red)
+- Displayed on vehicle cards and map popups
+- Helps choose less crowded services
+
+### 💰 Trip Cost Calculator
+- Zone-based fare calculation (1-3 zones)
+- Regular and concession prices
+- Displayed in trip results
+- Based on actual stop coordinates
+
 ### 🗺️ Journey Map
 - Full-screen map view for tracking
 - Animated vehicle markers
@@ -82,13 +107,15 @@ Real-time public transport tracking for Adelaide, Australia. Track buses, trains
 - [x] Favorite/saved trips
 - [x] Auto theme toggle
 - [x] Service disruption alerts
+- [x] **Line Status page** - Train/tram/bus line status overview
+- [x] **Next Departures** - Upcoming departures from nearby stops
+- [x] **Crowding Indicators** - Real-time occupancy levels
+- [x] **Trip Cost Calculator** - Zone-based fare estimation
 
 ### In Progress
 - [ ] Better route matching algorithm
-- [ ] Crowding indicators
 
 ### Planned
-- [ ] Trip cost calculator
 - [ ] Weather integration
 - [ ] Multiple language support
 
