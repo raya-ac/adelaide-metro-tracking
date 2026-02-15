@@ -3551,252 +3551,7 @@
                 .route-option:hover {
                     transform: translateX(4px);
                 }
-            
-        /* ==========================================
-           CROWDING INDICATOR STYLES - ENHANCED
-           ========================================== */
-        
-        .crowding-wrapper {
-            display: flex;
-            flex-direction: column;
-            gap: 0.25rem;
-            align-items: flex-end;
-        }
-        
-        .crowding-indicator {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.375rem;
-            padding: 0.25rem 0.5rem;
-            border-radius: var(--radius-sm);
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-        
-        .crowding-indicator.empty {
-            background: rgba(34, 197, 94, 0.15);
-            color: #22c55e;
-        }
-        
-        .crowding-indicator.light {
-            background: rgba(132, 204, 22, 0.15);
-            color: #84cc16;
-        }
-        
-        .crowding-indicator.moderate {
-            background: rgba(245, 158, 11, 0.15);
-            color: #f59e0b;
-        }
-        
-        .crowding-indicator.heavy {
-            background: rgba(239, 68, 68, 0.15);
-            color: #ef4444;
-        }
-        
-        .crowding-bar {
-            width: 60px;
-            height: 4px;
-            background: var(--bg-tertiary);
-            border-radius: 2px;
-            overflow: hidden;
-        }
-        
-        .crowding-bar-fill {
-            height: 100%;
-            border-radius: 2px;
-            transition: width 0.3s ease;
-        }
-        
-        .occupancy-bar-mini {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-top: 0.375rem;
-            font-size: 0.75rem;
-        }
-        
-        .occupancy-bar-mini .occupancy-fill {
-            height: 6px;
-            border-radius: 3px;
-            min-width: 20px;
-            transition: width 0.3s ease;
-        }
-        
-        .occupancy-bar-mini span {
-            color: var(--text-muted);
-            white-space: nowrap;
-        }
-        
-        .trend-increasing { color: #ef4444; }
-        .trend-decreasing { color: #22c55e; }
-        .trend-stable { color: var(--text-muted); }
-        
-        .crowding-chart {
-            background: var(--bg-tertiary);
-            border-radius: var(--radius);
-            padding: 1rem;
-            margin-top: 1rem;
-        }
-        
-        .crowding-chart-title {
-            font-weight: 600;
-            margin-bottom: 0.75rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .crowding-bars {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            height: 80px;
-            gap: 0.5rem;
-        }
-        
-        .crowding-bar-item {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.375rem;
-        }
-        
-        .crowding-bar-track {
-            width: 100%;
-            height: 60px;
-            background: var(--bg-secondary);
-            border-radius: var(--radius-sm);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .crowding-bar-item .crowding-bar-fill {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            border-radius: 0 0 var(--radius-sm) var(--radius-sm);
-            transition: height 0.3s ease;
-        }
-        
-        .crowding-bar-label {
-            font-size: 0.625rem;
-            color: var(--text-muted);
-        }
-        
-        .crowding-legend {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin-top: 0.75rem;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-        
-        .crowding-legend span {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-        
-        .crowding-alternatives {
-            background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(132, 204, 22, 0.05) 100%);
-            border: 1px solid rgba(34, 197, 94, 0.2);
-            border-radius: var(--radius);
-            padding: 1rem;
-            margin-top: 1rem;
-        }
-        
-        .crowding-alt-title {
-            font-weight: 600;
-            color: #22c55e;
-            margin-bottom: 0.75rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .crowding-alt-item {
-            background: var(--bg-secondary);
-            border-radius: var(--radius-sm);
-            padding: 0.75rem;
-            margin-bottom: 0.5rem;
-        }
-        
-        .crowding-alt-item:last-child {
-            margin-bottom: 0;
-        }
-        
-        .crowding-alt-route {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.375rem;
-        }
-        
-        .crowding-alt-time {
-            font-weight: 600;
-        }
-        
-        .crowding-alt-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.25rem;
-            padding: 0.125rem 0.375rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-        
-        .crowding-alt-badge.light {
-            background: rgba(34, 197, 94, 0.15);
-            color: #22c55e;
-        }
-        
-        .crowding-alt-badge.moderate {
-            background: rgba(245, 158, 11, 0.15);
-            color: #f59e0b;
-        }
-        
-        .crowding-alt-legs {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-        }
-        
-        .crowding-alt-leg {
-            font-weight: 500;
-        }
-        
-        .occupancy-comparison {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-        
-        .occupancy-item {
-            text-align: center;
-            padding: 0.75rem;
-            background: var(--bg-tertiary);
-            border-radius: var(--radius);
-        }
-        
-        .occupancy-label {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-bottom: 0.25rem;
-        }
-        
-        .occupancy-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-        
-        .crowding-tips ul li {
-            margin-bottom: 0.25rem;
-        }
-</style>
+            </style>
         `);
 
         async function fetchRoutes() {
@@ -4308,16 +4063,12 @@
             const nearbyTo = getNearbyStops(toStop.lat, toStop.lon, 3, 500);
             
             // Try to find a route with one transfer
-            // Look for stops that are on the same route from both origin and destination
             for (const fromNearby of nearbyFrom) {
                 for (const toNearby of nearbyTo) {
-                    // Skip if same stop
                     if (fromNearby.n === toNearby.n) continue;
                     
-                    // Check for train + bus combinations
                     const trainRoute = findDirectRoute(fromNearby, toNearby, addMinutes(startTime, 5));
                     if (trainRoute && trainRoute.legs[0].mode === 'train') {
-                        // Check if this helps us get closer to destination
                         const secondLeg = findDirectRoute({n: toNearby.n, lat: toNearby.lat, lon: toNearby.lon}, toStop, addMinutes(startTime, trainRoute.totalTime + 5));
                         if (secondLeg) {
                             routes.push({
@@ -4355,11 +4106,10 @@
 
         // Trip Cost Calculator
         function calculateTripCost(route) {
-            const baseFare = 4.05; // MetroCARD peak fare
-            const offPeakFare = 2.55; // MetroCARD off-peak
-            const concessionFare = 2.00; // Concession
+            const baseFare = 4.05;
+            const offPeakFare = 2.55;
+            const concessionFare = 2.00;
             
-            // Determine if peak hour (simplified)
             const now = new Date();
             const hour = now.getHours();
             const isPeak = (hour >= 7 && hour <= 9) || (hour >= 16 && hour <= 18);
@@ -4369,7 +4119,7 @@
             return {
                 metrocard: fare,
                 concession: concessionFare,
-                cash: fare + 1.00, // Cash is more expensive
+                cash: fare + 1.00,
                 isPeak: isPeak
             };
         }
@@ -4387,11 +4137,11 @@
                 } else {
                     favorites.push({ from, to, timestamp: Date.now() });
                     showNotification('Added to favorites', 'success');
-                    return true;
                 }
                 
                 localStorage.setItem('adelaideMetroFavorites', JSON.stringify(favorites));
                 renderFavoriteRoutes();
+                return true;
             } catch (e) {
                 console.log('Could not toggle favorite:', e);
                 return false;
@@ -4411,28 +4161,16 @@
                 }
                 
                 container.style.display = 'block';
-                container.innerHTML = `
-                    <div class="section-title" style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; color: var(--text-secondary); font-size: 0.875rem; font-weight: 600;">
-                        <i class="fas fa-star" style="color: #fbbf24;"></i>
-                        Favorite Routes
+                container.innerHTML = favorites.map(fav => `
+                    <div class="favorite-route-item" onclick="loadRecentTrip('${fav.from.replace(/'/g, "\\'")}', '${fav.to.replace(/'/g, "\\'")}')">
+                        <div class="favorite-route-icon"><i class="fas fa-star"></i></div>
+                        <div class="favorite-route-details">
+                            <div class="favorite-route-name">${fav.from} <i class="fas fa-arrow-right"></i> ${fav.to}</div>
+                            <div class="favorite-route-hint">Tap to plan trip</div>
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
                     </div>
-                    <div class="favorite-routes-list">
-                        ${favorites.map(fav => `
-                            <div class="favorite-route-item" onclick="loadRecentTrip('${fav.from.replace(/'/g, "\\'")}', '${fav.to.replace(/'/g, "\\'")}')" style="display: flex; align-items: center; justify-content: space-between; padding: 0.75rem; background: var(--bg-tertiary); border-radius: var(--radius); margin-bottom: 0.5rem; cursor: pointer; transition: all 0.2s;">
-                                <div style="display: flex; align-items: center; gap: 0.75rem;">
-                                    <div style="width: 32px; height: 32px; background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.875rem;">
-                                        <i class="fas fa-star"></i>
-                                    </div>
-                                    <div>
-                                        <div style="font-weight: 600; font-size: 0.9rem;">${fav.from} <i class="fas fa-arrow-right" style="color: var(--text-muted); margin: 0 0.25rem;"></i> ${fav.to}</div>
-                                        <div style="font-size: 0.75rem; color: var(--text-muted);">Tap to plan trip</div>
-                                    </div>
-                                </div>
-                                <i class="fas fa-chevron-right" style="color: var(--text-muted);"></i>
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
+                `).join('');
             } catch (e) {
                 console.log('Could not render favorites:', e);
             }
@@ -4447,20 +4185,20 @@
                 top: 80px;
                 left: 50%;
                 transform: translateX(-50%);
-                background: ${type === 'success' ? 'var(--success)' : type === 'error' ? 'var(--danger)' : 'var(--accent-primary)'};
+                background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#6366f1'};
                 color: white;
                 padding: 0.75rem 1.5rem;
-                border-radius: var(--radius);
+                border-radius: 12px;
                 font-weight: 600;
                 z-index: 10000;
-                box-shadow: var(--shadow-lg);
-                animation: slideDown 0.3s ease;
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
             `;
             notification.innerHTML = `<i class="fas fa-${type === 'success' ? 'check' : type === 'error' ? 'exclamation' : 'info'}-circle"></i> ${message}`;
             document.body.appendChild(notification);
             
             setTimeout(() => {
-                notification.style.animation = 'slideUp 0.3s ease';
+                notification.style.opacity = '0';
+                notification.style.transition = 'opacity 0.3s';
                 setTimeout(() => notification.remove(), 300);
             }, 3000);
         }
@@ -4702,7 +4440,7 @@
             }
         }
 
-        // Override switchTab to clean up tracking and render status
+        // Override switchTab to clean up tracking
         const originalSwitchTab = switchTab;
         switchTab = function(tab) {
             if (tab !== 'plan' && activeJourney) {
@@ -4714,12 +4452,6 @@
                 if (mapContainer) mapContainer.style.display = 'none';
                 if (vehiclesContainer) vehiclesContainer.style.display = 'none';
             }
-            
-            // Render line status when status tab is shown
-            if (tab === 'status') {
-                renderLineStatus();
-            }
-            
             originalSwitchTab(tab);
         };
 
@@ -5502,24 +5234,12 @@
             const busContainer = document.getElementById('bus-line-status');
             const updatedEl = document.getElementById('line-status-updated');
             
-            if (!trainContainer || !tramContainer || !busContainer) {
-                console.log('[Status] Containers not ready yet');
-                return;
-            }
+            if (!trainContainer || !tramContainer || !busContainer) return;
             
-            // Show loading state initially
-            if (trainContainer.innerHTML === '') {
-                trainContainer.innerHTML = '<div class="loading-container" style="padding: 1rem;"><div class="spinner"></div><span class="loading-text">Loading status...</span></div>';
-                tramContainer.innerHTML = '<div class="loading-container" style="padding: 1rem;"><div class="spinner"></div><span class="loading-text">Loading status...</span></div>';
-                busContainer.innerHTML = '<div class="loading-container" style="padding: 1rem;"><div class="spinner"></div><span class="loading-text">Loading status...</span></div>';
-            }
-            
-            // Get current alerts (default to empty array if alertHistory not ready)
-            const activeAlerts = (alertHistory || []).filter(a => 
-                a && a.seenAt && (Date.now() - a.seenAt < 24 * 60 * 60 * 1000) // Last 24 hours
+            // Get current alerts
+            const activeAlerts = alertHistory.filter(a => 
+                Date.now() - a.seenAt < 24 * 60 * 60 * 1000 // Last 24 hours
             );
-            
-            console.log(`[Status] Rendering with ${activeAlerts.length} active alerts`);
             
             // Render train lines
             trainContainer.innerHTML = TRAIN_LINES.map(line => {
@@ -6731,561 +6451,6 @@
             const modal = document.getElementById('help-modal');
             if (modal) modal.remove();
         }
-        
-        // ==========================================
-        // OFFLINE SUPPORT & CACHING
-        // ==========================================
-        
-        const CACHE_KEY = 'adelaideMetroCache_v1';
-        let isOffline = false;
-        
-        // Check online status
-        function updateOnlineStatus() {
-            isOffline = !navigator.onLine;
-            const offlineIndicator = document.getElementById('offline-indicator');
-            if (offlineIndicator) {
-                offlineIndicator.style.display = isOffline ? 'flex' : 'none';
-            }
-            
-            if (isOffline) {
-                showNotification('You\'re offline. Using cached data.', 'info');
-            }
-        }
-        
-        window.addEventListener('online', () => {
-            isOffline = false;
-            showNotification('Back online!', 'success');
-            fetchVehicles(true);
-            fetchAlertsEnhanced();
-        });
-        
-        window.addEventListener('offline', updateOnlineStatus);
-        
-        // Cache API responses
-        async function cacheData(key, data, ttlMinutes = 60) {
-            try {
-                const cache = {
-                    data,
-                    timestamp: Date.now(),
-                    expires: Date.now() + (ttlMinutes * 60 * 1000)
-                };
-                localStorage.setItem(`${CACHE_KEY}_${key}`, JSON.stringify(cache));
-            } catch (e) {
-                console.log('Cache save failed:', e);
-            }
-        }
-        
-        function getCachedData(key) {
-            try {
-                const cached = localStorage.getItem(`${CACHE_KEY}_${key}`);
-                if (!cached) return null;
-                
-                const parsed = JSON.parse(cached);
-                if (Date.now() > parsed.expires) {
-                    localStorage.removeItem(`${CACHE_KEY}_${key}`);
-                    return null;
-                }
-                return parsed.data;
-            } catch (e) {
-                return null;
-            }
-        }
-        
-        function getCacheAge(key) {
-            try {
-                const cached = localStorage.getItem(`${CACHE_KEY}_${key}`);
-                if (!cached) return null;
-                
-                const parsed = JSON.parse(cached);
-                const age = Math.floor((Date.now() - parsed.timestamp) / 1000 / 60);
-                return age;
-            } catch (e) {
-                return null;
-            }
-        }
-        
-        // ==========================================
-        // PUSH NOTIFICATIONS
-        // ==========================================
-        
-        let notificationPermission = 'default';
-        
-        async function initNotifications() {
-            if (!('Notification' in window)) {
-                console.log('Notifications not supported');
-                return;
-            }
-            
-            notificationPermission = Notification.permission;
-            
-            // Create notification toggle in settings if it doesn't exist
-            createNotificationSettings();
-        }
-        
-        function createNotificationSettings() {
-            // Add to header actions if not exists
-            const headerActions = document.querySelector('.header-actions');
-            if (!headerActions || document.getElementById('notification-toggle')) return;
-            
-            const notifBtn = document.createElement('button');
-            notifBtn.id = 'notification-toggle';
-            notifBtn.className = 'icon-btn';
-            notifBtn.title = 'Notification settings';
-            notifBtn.innerHTML = '<i class="fas fa-bell"></i>';
-            notifBtn.onclick = requestNotificationPermission;
-            
-            headerActions.insertBefore(notifBtn, headerActions.firstChild);
-        }
-        
-        async function requestNotificationPermission() {
-            if (!('Notification' in window)) {
-                showNotification('Notifications not supported in this browser', 'error');
-                return;
-            }
-            
-            const permission = await Notification.requestPermission();
-            notificationPermission = permission;
-            
-            if (permission === 'granted') {
-                showNotification('Notifications enabled!', 'success');
-                updateNotificationIcon(true);
-                
-                // Send test notification
-                new Notification('Adelaide Metro Live', {
-                    body: 'You\'ll now receive alerts for your favorite routes',
-                    icon: '/favicon-32.png'
-                });
-            } else {
-                showNotification('Notifications disabled', 'info');
-                updateNotificationIcon(false);
-            }
-        }
-        
-        function updateNotificationIcon(enabled) {
-            const btn = document.getElementById('notification-toggle');
-            if (btn) {
-                btn.innerHTML = enabled 
-                    ? '<i class="fas fa-bell" style="color: var(--success);"></i>'
-                    : '<i class="fas fa-bell-slash"></i>';
-            }
-        }
-        
-        function sendNotification(title, options = {}) {
-            if (notificationPermission !== 'granted') return;
-            
-            const defaultOptions = {
-                icon: '/favicon-32.png',
-                badge: '/favicon-32.png',
-                tag: 'adelaide-metro',
-                requireInteraction: false
-            };
-            
-            return new Notification(title, { ...defaultOptions, ...options });
-        }
-        
-        // Check for alert notifications
-        function checkAlertNotifications(alerts) {
-            const favorites = JSON.parse(localStorage.getItem('adelaideMetroFavorites') || '[]');
-            if (favorites.length === 0) return;
-            
-            alerts.forEach(alert => {
-                // Check if alert affects any favorite route
-                const affectedFavorites = favorites.filter(fav => {
-                    return alert.affectedRoutes?.some(route => 
-                        fav.from.toLowerCase().includes(route.toLowerCase()) ||
-                        fav.to.toLowerCase().includes(route.toLowerCase())
-                    );
-                });
-                
-                if (affectedFavorites.length > 0 && alert.severity !== 'info') {
-                    // Check if we already notified for this alert
-                    const notifiedAlerts = JSON.parse(localStorage.getItem('adelaideMetroNotifiedAlerts') || '[]');
-                    if (!notifiedAlerts.includes(alert.id)) {
-                        sendNotification('Service Alert: ' + alert.title, {
-                            body: alert.description,
-                            tag: 'alert-' + alert.id
-                        });
-                        
-                        notifiedAlerts.push(alert.id);
-                        localStorage.setItem('adelaideMetroNotifiedAlerts', JSON.stringify(notifiedAlerts.slice(-20)));
-                    }
-                }
-            });
-        }
-        
-        // ==========================================
-        // ENHANCED TRIP HISTORY
-        // ==========================================
-        
-        const TRIP_HISTORY_KEY = 'adelaideMetroTripHistory';
-        
-        function recordTrip(from, to, distance) {
-            try {
-                let history = JSON.parse(localStorage.getItem(TRIP_HISTORY_KEY) || '[]');
-                
-                history.unshift({
-                    from,
-                    to,
-                    distance,
-                    timestamp: Date.now(),
-                    duration: null // Could be filled in later
-                });
-                
-                // Keep last 50 trips
-                history = history.slice(0, 50);
-                localStorage.setItem(TRIP_HISTORY_KEY, JSON.stringify(history));
-                
-                // Update stats
-                updateTripStats();
-            } catch (e) {
-                console.log('Could not record trip:', e);
-            }
-        }
-        
-        function getTripHistory() {
-            try {
-                return JSON.parse(localStorage.getItem(TRIP_HISTORY_KEY) || '[]');
-            } catch (e) {
-                return [];
-            }
-        }
-        
-        function updateTripStats() {
-            const history = getTripHistory();
-            const statsEl = document.getElementById('trip-stats');
-            if (!statsEl) return;
-            
-            const totalTrips = history.length;
-            const totalDistance = history.reduce((sum, t) => sum + (t.distance || 0), 0);
-            const thisWeek = history.filter(t => Date.now() - t.timestamp < 7 * 24 * 60 * 60 * 1000).length;
-            
-            // Get most frequent route
-            const routeCounts = {};
-            history.forEach(t => {
-                const key = `${t.from} → ${t.to}`;
-                routeCounts[key] = (routeCounts[key] || 0) + 1;
-            });
-            
-            const topRoute = Object.entries(routeCounts)
-                .sort((a, b) => b[1] - a[1])[0];
-            
-            statsEl.innerHTML = `
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-label">Total Trips</div>
-                        <div class="stat-value">${totalTrips}</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">This Week</div>
-                        <div class="stat-value">${thisWeek}</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Total Distance</div>
-                        <div class="stat-value">${(totalDistance / 1000).toFixed(1)}km</div>
-                    </div>
-                    ${topRoute ? `
-                    <div class="stat-card">
-                        <div class="stat-label">Favorite Route</div>
-                        <div class="stat-value" style="font-size: 0.9rem;">${topRoute[0]}</div>
-                    </div>
-                    ` : ''}
-                </div>
-            `;
-        }
-        
-        function renderFrequentRoutes() {
-            const history = getTripHistory();
-            const container = document.getElementById('frequent-routes');
-            if (!container) return;
-            
-            // Count route frequency
-            const routeCounts = {};
-            history.forEach(t => {
-                const key = `${t.from}|${t.to}`;
-                routeCounts[key] = (routeCounts[key] || 0) + 1;
-            });
-            
-            // Get top 5
-            const topRoutes = Object.entries(routeCounts)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 5);
-            
-            if (topRoutes.length === 0) {
-                container.innerHTML = '';
-                return;
-            }
-            
-            container.innerHTML = `
-                <div style="margin-top: 1rem;">
-                    <div class="section-header" style="margin-bottom: 0.75rem;">
-                        <i class="fas fa-chart-line"></i>
-                        <span>Frequently Used</span>
-                    </div>
-                    ${topRoutes.map(([key, count]) => {
-                        const [from, to] = key.split('|');
-                        return `
-                            <div class="frequent-route-item" onclick="loadRecentTrip('${from.replace(/'/g, "\\'")}', '${to.replace(/'/g, "\\'")}')" 
-                                 style="display: flex; align-items: center; justify-content: space-between; padding: 0.75rem; background: var(--bg-tertiary); border-radius: var(--radius); margin-bottom: 0.5rem; cursor: pointer;">
-                                <div style="display: flex; align-items: center; gap: 0.75rem;">
-                                    <div style="width: 28px; height: 28px; background: var(--accent-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.75rem; font-weight: 700;">
-                                        ${count}
-                                    </div>
-                                    <div>
-                                        <div style="font-weight: 600; font-size: 0.9rem;">${from} <i class="fas fa-arrow-right" style="color: var(--text-muted); margin: 0 0.25rem;"></i> ${to}</div>
-                                    </div>
-                                </div>
-                                <i class="fas fa-chevron-right" style="color: var(--text-muted);"></i>
-                            </div>
-                        `;
-                    }).join('')}
-                </div>
-            `;
-        }
-        
-        function exportTripHistory() {
-            const history = getTripHistory();
-            const dataStr = JSON.stringify(history, null, 2);
-            const blob = new Blob([dataStr], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `adelaide-metro-history-${new Date().toISOString().split('T')[0]}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            showNotification('Trip history exported!', 'success');
-        }
-        
-        function clearTripHistory() {
-            if (confirm('Are you sure you want to clear all trip history? This cannot be undone.')) {
-                localStorage.removeItem(TRIP_HISTORY_KEY);
-                updateTripStats();
-                renderFrequentRoutes();
-                showNotification('Trip history cleared', 'info');
-            }
-        }
-        
-        // ==========================================
-        // CROWDING INFORMATION
-        // ==========================================
-        
-        function getCrowdingLevel(vehicle) {
-            // Simulate crowding based on time of day, route type, and random factor
-            const hour = new Date().getHours();
-            const isPeak = (hour >= 7 && hour <= 9) || (hour >= 16 && hour <= 18);
-            const day = new Date().getDay();
-            const isWeekend = day === 0 || day === 6;
-            
-            // Base crowding by vehicle type
-            let baseCrowding = {
-                'train': isPeak ? 0.7 : 0.4,
-                'tram': isPeak ? 0.6 : 0.3,
-                'bus': isPeak ? 0.5 : 0.3
-            }[vehicle.type] || 0.3;
-            
-            // Weekend reduction
-            if (isWeekend) baseCrowding *= 0.6;
-            
-            // Random variation
-            const variation = (Math.random() - 0.5) * 0.4;
-            let crowding = baseCrowding + variation;
-            crowding = Math.max(0, Math.min(1, crowding));
-            
-            // Return level 1-4
-            if (crowding < 0.25) return { level: 1, label: 'Empty', color: '#10b981', percent: crowding };
-            if (crowding < 0.5) return { level: 2, label: 'Light', color: '#f59e0b', percent: crowding };
-            if (crowding < 0.75) return { level: 3, label: 'Moderate', color: '#f97316', percent: crowding };
-            return { level: 4, label: 'Heavy', color: '#ef4444', percent: crowding };
-        }
-        
-        function renderCrowdingIndicator(vehicle) {
-            const crowding = getCrowdingLevel(vehicle);
-            const width = Math.round(crowding.percent * 100);
-            
-            return `
-                <div class="crowding-indicator" title="Crowding: ${crowding.label}">
-                    <div class="crowding-bar" style="display: flex; gap: 2px; height: 6px; width: 40px;">
-                        <div style="flex: 1; background: ${crowding.level >= 1 ? crowding.color : 'rgba(255,255,255,0.2)'}; border-radius: 1px;"></div>
-                        <div style="flex: 1; background: ${crowding.level >= 2 ? crowding.color : 'rgba(255,255,255,0.2)'}; border-radius: 1px;"></div>
-                        <div style="flex: 1; background: ${crowding.level >= 3 ? crowding.color : 'rgba(255,255,255,0.2)'}; border-radius: 1px;"></div>
-                        <div style="flex: 1; background: ${crowding.level >= 4 ? crowding.color : 'rgba(255,255,255,0.2)'}; border-radius: 1px;"></div>
-                    </div>
-                    <span class="crowding-label" style="font-size: 0.7rem; color: ${crowding.color}; margin-left: 0.25rem;">${crowding.label}</span>
-                </div>
-            `;
-        }
-        
-        // ==========================================
-        // VEHICLE MATCHING FOR TRIPS
-        // ==========================================
-        
-        let matchedVehicles = new Map(); // route index -> matched vehicle
-        let journeyTrackingInterval = null;
-        
-        function startJourneyTracking(routeIndex) {
-            if (journeyTrackingInterval) {
-                clearInterval(journeyTrackingInterval);
-            }
-            
-            const route = plannedRoutes[routeIndex];
-            if (!route) return;
-            
-            // Find matching vehicles
-            updateMatchedVehicles(route, routeIndex);
-            
-            // Update every 30 seconds
-            journeyTrackingInterval = setInterval(() => {
-                updateMatchedVehicles(route, routeIndex);
-            }, 30000);
-        }
-        
-        function updateMatchedVehicles(route, routeIndex) {
-            if (!route || !route.legs) return;
-            
-            route.legs.forEach((leg, legIndex) => {
-                if (leg.type !== 'transit') return;
-                
-                // Find vehicles matching this leg
-                const matchingVehicles = vehicles.filter(v => {
-                    if (!v.route_name || !leg.route) return false;
-                    return v.route_name.toLowerCase().includes(leg.route.toLowerCase()) ||
-                           leg.route.toLowerCase().includes(v.route_name.toLowerCase());
-                });
-                
-                if (matchingVehicles.length > 0) {
-                    // Sort by closest to user's location (if known) or just take first
-                    const bestMatch = matchingVehicles[0];
-                    matchedVehicles.set(`${routeIndex}-${legIndex}`, bestMatch);
-                    
-                    // Update UI
-                    updateJourneyStatus(routeIndex, legIndex, bestMatch);
-                }
-            });
-        }
-        
-        function updateJourneyStatus(routeIndex, legIndex, vehicle) {
-            const statusEl = document.getElementById(`journey-leg-${routeIndex}-${legIndex}`);
-            if (!statusEl) return;
-            
-            const stopsAway = vehicle.arrival_minutes 
-                ? `${vehicle.arrival_minutes} min away`
-                : 'Arriving soon';
-            
-            statusEl.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--success); font-size: 0.875rem;">
-                    <i class="fas fa-bus"></i>
-                    <span>Your ${vehicle.route_name} is ${stopsAway}</span>
-                    ${renderCrowdingIndicator(vehicle)}
-                </div>
-            `;
-        }
-        
-        function stopJourneyTracking() {
-            if (journeyTrackingInterval) {
-                clearInterval(journeyTrackingInterval);
-                journeyTrackingInterval = null;
-            }
-            matchedVehicles.clear();
-        }
-        
-        // ==========================================
-        // ACCESSIBILITY FEATURES
-        // ==========================================
-        
-        let accessibilityMode = {
-            highContrast: false,
-            largeText: false,
-            reducedMotion: false,
-            screenReaderOptimized: false
-        };
-        
-        const ACCESSIBILITY_KEY = 'adelaideMetroAccessibility';
-        
-        function loadAccessibilitySettings() {
-            try {
-                const saved = localStorage.getItem(ACCESSIBILITY_KEY);
-                if (saved) {
-                    accessibilityMode = { ...accessibilityMode, ...JSON.parse(saved) };
-                    applyAccessibilitySettings();
-                }
-            } catch (e) {
-                console.log('Could not load accessibility settings:', e);
-            }
-        }
-        
-        function saveAccessibilitySettings() {
-            localStorage.setItem(ACCESSIBILITY_KEY, JSON.stringify(accessibilityMode));
-            applyAccessibilitySettings();
-        }
-        
-        function applyAccessibilitySettings() {
-            const root = document.documentElement;
-            
-            if (accessibilityMode.highContrast) {
-                root.style.setProperty('--bg-primary', '#000000');
-                root.style.setProperty('--bg-secondary', '#000000');
-                root.style.setProperty('--text-primary', '#ffffff');
-                root.style.setProperty('--border', '#ffffff');
-                document.body.classList.add('high-contrast');
-            } else {
-                root.style.removeProperty('--bg-primary');
-                root.style.removeProperty('--bg-secondary');
-                root.style.removeProperty('--text-primary');
-                root.style.removeProperty('--border');
-                document.body.classList.remove('high-contrast');
-            }
-            
-            if (accessibilityMode.largeText) {
-                document.body.style.fontSize = '1.2rem';
-            } else {
-                document.body.style.fontSize = '';
-            }
-            
-            if (accessibilityMode.reducedMotion) {
-                document.body.classList.add('reduce-motion');
-            } else {
-                document.body.classList.remove('reduce-motion');
-            }
-        }
-        
-        function toggleHighContrast() {
-            accessibilityMode.highContrast = !accessibilityMode.highContrast;
-            saveAccessibilitySettings();
-            showNotification(accessibilityMode.highContrast ? 'High contrast enabled' : 'High contrast disabled', 'info');
-        }
-        
-        function toggleLargeText() {
-            accessibilityMode.largeText = !accessibilityMode.largeText;
-            saveAccessibilitySettings();
-            showNotification(accessibilityMode.largeText ? 'Large text enabled' : 'Large text disabled', 'info');
-        }
-        
-        // Announce to screen reader
-        function announceToScreenReader(message) {
-            const liveRegion = document.getElementById('live-region');
-            if (liveRegion) {
-                liveRegion.textContent = message;
-                // Clear after announcement
-                setTimeout(() => {
-                    liveRegion.textContent = '';
-                }, 1000);
-            }
-        }
-        
-        // Initialize everything
-        function initAll() {
-            updateOnlineStatus();
-            initNotifications();
-            loadAccessibilitySettings();
-            updateTripStats();
-            renderFrequentRoutes();
-        }
-        
-        // Run initialization
-        initAll();
         
         // Initialize help system
         initHelpSystem();
