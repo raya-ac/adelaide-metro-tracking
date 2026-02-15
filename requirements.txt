@@ -1,0 +1,4 @@
+Flask>=2.0.0
+requests>=2.25.0
+python-dotenv>=0.19.0
+google-transit-protobuf>=0.0.1

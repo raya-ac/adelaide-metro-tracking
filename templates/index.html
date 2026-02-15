@@ -1,0 +1,3765 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Adelaide Metro Live</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #111827;
+            --bg-tertiary: #1f2937;
+            --bg-glass: rgba(17, 24, 39, 0.85);
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            --accent-primary: #6366f1;
+            --accent-secondary: #8b5cf6;
+            --accent-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --train: #3b82f6;
+            --tram: #06b6d4;
+            --bus: #10b981;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
+            --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.3);
+            --radius-sm: 8px;
+            --radius: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #f1f5f9;
+            --bg-glass: rgba(255, 255, 255, 0.9);
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html {
+            font-size: 16px;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.5;
+        }
+
+        /* App Container */
+        .app {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 0.75rem 1rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--accent-gradient);
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            box-shadow: var(--shadow-glow);
+        }
+
+        .brand-text {
+            font-size: 1.25rem;
+            font-weight: 800;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius);
+            border: none;
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1rem;
+        }
+
+        .icon-btn:hover {
+            background: var(--accent-primary);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .icon-btn.active {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            margin-top: 64px;
+            overflow: hidden;
+        }
+
+        /* Tab Navigation */
+        .tab-nav {
+            display: flex;
+            background: var(--bg-secondary);
+            padding: 0.5rem;
+            gap: 0.5rem;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .tab-nav::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab-btn {
+            flex: 1;
+            min-width: 80px;
+            padding: 0.75rem 1rem;
+            border: none;
+            border-radius: var(--radius);
+            background: transparent;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .tab-btn.active {
+            background: var(--accent-gradient);
+            color: white;
+            box-shadow: var(--shadow);
+        }
+
+        .tab-btn .badge {
+            background: rgba(255,255,255,0.2);
+            padding: 0.125rem 0.375rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .tab-panel {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+            padding: 1rem;
+        }
+
+        .tab-panel.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Search Bar */
+        .search-container {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--bg-primary);
+            padding-bottom: 1rem;
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-lg);
+            padding: 0.875rem 1rem;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .search-bar:focus-within {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .search-bar i {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        .search-bar input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            color: var(--text-primary);
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .search-bar input::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(255,255,255,0.05);
+            overflow: hidden;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .card-header {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-body {
+            padding: 1.25rem;
+        }
+
+        /* Vehicle Card */
+        .vehicle-card {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border: 1px solid rgba(255,255,255,0.05);
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .vehicle-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--accent-primary);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .vehicle-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--accent-primary);
+        }
+
+        .vehicle-card:hover::before {
+            opacity: 1;
+        }
+
+        .vehicle-card.train::before { background: var(--train); }
+        .vehicle-card.tram::before { background: var(--tram); }
+        .vehicle-card.bus::before { background: var(--bus); }
+
+        .vehicle-header {
+            display: flex;
+            align-items: center;
+            gap: 0.875rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .vehicle-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .vehicle-icon.train { background: rgba(59, 130, 246, 0.15); }
+        .vehicle-icon.tram { background: rgba(6, 182, 212, 0.15); }
+        .vehicle-icon.bus { background: rgba(16, 185, 129, 0.15); }
+
+        .vehicle-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .vehicle-route {
+            font-size: 1.125rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .vehicle-destination {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .vehicle-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.625rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .status-badge.on-time { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+        .status-badge.delayed { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+        .status-badge.early { background: rgba(59, 130, 246, 0.15); color: var(--info); }
+
+        .vehicle-details {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .detail-item i {
+            color: var(--text-muted);
+        }
+
+        .arrival-time {
+            margin-left: auto;
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--warning);
+        }
+
+        .arrival-time.soon {
+            color: var(--danger);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        /* Map Container */
+        .map-container {
+            position: relative;
+            height: 100%;
+            background: var(--bg-secondary);
+        }
+
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+
+        .map-overlay {
+            position: absolute;
+            bottom: 1rem;
+            left: 1rem;
+            right: 1rem;
+            z-index: 500;
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .map-overlay::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filter-chip {
+            flex-shrink: 0;
+            padding: 0.625rem 1rem;
+            background: var(--bg-glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: var(--radius-xl);
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filter-chip:hover, .filter-chip.active {
+            background: var(--accent-gradient);
+            border-color: transparent;
+        }
+
+        /* Alert Banner */
+        .alert-banner {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(239, 68, 68, 0.15) 100%);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: var(--radius);
+            padding: 0.875rem 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .alert-banner i {
+            color: var(--warning);
+            font-size: 1.125rem;
+            margin-top: 0.125rem;
+        }
+
+        .alert-content {
+            flex: 1;
+        }
+
+        .alert-title {
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .alert-text {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            border-radius: var(--radius);
+            padding: 1rem;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-value.train { color: var(--train); }
+        .stat-value.tram { color: var(--tram); }
+        .stat-value.bus { color: var(--bus); }
+        .stat-value.total { background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Trip Planner */
+        .trip-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .trip-input {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius);
+            padding: 0.875rem 1rem;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .trip-input:focus-within {
+            border-color: var(--accent-primary);
+        }
+
+        .trip-input i {
+            color: var(--text-muted);
+            width: 20px;
+        }
+
+        .trip-input input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            color: var(--text-primary);
+            font-size: 1rem;
+            outline: none;
+        }
+
+        /* Autocomplete Dropdown */
+        .autocomplete-container {
+            position: relative;
+        }
+
+        .autocomplete-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--bg-secondary);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: var(--radius);
+            margin-top: 0.5rem;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .autocomplete-dropdown.active {
+            display: block;
+        }
+
+        .autocomplete-item {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            transition: background 0.15s;
+        }
+
+        .autocomplete-item:hover,
+        .autocomplete-item.selected {
+            background: var(--bg-tertiary);
+        }
+
+        .autocomplete-item:last-child {
+            border-bottom: none;
+        }
+
+        .autocomplete-item .stop-name {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .autocomplete-item .stop-info {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        /* Enhanced Trip Planner */
+        .trip-planner-container {
+            padding: 1rem;
+        }
+
+        .location-inputs-card {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            padding: 1.25rem;
+            border: 1px solid rgba(255,255,255,0.05);
+            box-shadow: var(--shadow);
+        }
+
+        .location-input-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .location-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            border: 2px solid;
+        }
+
+        .location-dot.origin {
+            background: var(--success);
+            border-color: var(--success);
+        }
+
+        .location-dot.destination {
+            background: transparent;
+            border-color: var(--danger);
+        }
+
+        .location-input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        .location-input-wrapper input {
+            width: 100%;
+            background: var(--bg-tertiary);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: var(--radius);
+            padding: 0.875rem 2.5rem 0.875rem 1rem;
+            color: var(--text-primary);
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .location-input-wrapper input:focus {
+            border-color: var(--accent-primary);
+            background: var(--bg-secondary);
+        }
+
+        .location-input-wrapper input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .location-action-btn {
+            position: absolute;
+            right: 0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            color: var(--accent-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .location-action-btn:hover {
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .location-action-btn.locating {
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .location-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 0;
+            position: relative;
+        }
+
+        .location-divider::before {
+            content: '';
+            position: absolute;
+            left: 5px;
+            right: 0;
+            top: 50%;
+            height: 1px;
+            background: linear-gradient(to right, rgba(255,255,255,0.1), transparent);
+        }
+
+        .swap-btn-enhanced {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            z-index: 1;
+        }
+
+        .swap-btn-enhanced:hover {
+            background: var(--accent-primary);
+            color: white;
+            transform: rotate(180deg);
+            border-color: var(--accent-primary);
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.75rem;
+            margin: 1.25rem 0;
+        }
+
+        .quick-action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.875rem 0.5rem;
+            background: var(--bg-secondary);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: var(--radius);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quick-action-btn:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--accent-primary);
+            color: var(--text-primary);
+        }
+
+        .quick-action-btn i {
+            font-size: 1.25rem;
+            color: var(--accent-primary);
+        }
+
+        .quick-action-btn span {
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .plan-route-btn {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            background: var(--accent-gradient);
+            border: none;
+            border-radius: var(--radius);
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            box-shadow: var(--shadow-glow);
+            transition: all 0.2s;
+        }
+
+        .plan-route-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(99, 102, 241, 0.4);
+        }
+
+        .plan-route-btn:active {
+            transform: translateY(0);
+        }
+
+        .recent-trips-section {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        /* Nearby Stops Section */
+        .nearby-stops-section {
+            margin-top: 1.25rem;
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .nearby-stops-section .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            justify-content: space-between;
+        }
+
+        .refresh-location-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: none;
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            transition: all 0.2s;
+        }
+
+        .refresh-location-btn:hover {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        .refresh-location-btn.spinning i {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .location-status {
+            text-align: center;
+            padding: 1rem;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            cursor: pointer;
+            border-radius: var(--radius);
+            background: var(--bg-tertiary);
+            transition: all 0.2s;
+        }
+
+        .location-status:hover {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--accent-primary);
+        }
+
+        .location-status.locating {
+            color: var(--accent-primary);
+        }
+
+        .nearby-stops-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nearby-stop-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.875rem;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .nearby-stop-item:hover {
+            border-color: var(--accent-primary);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .nearby-stop-rank {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--accent-gradient);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .nearby-stop-rank.walking {
+            background: var(--success);
+        }
+
+        .nearby-stop-rank.biking {
+            background: var(--warning);
+        }
+
+        .nearby-stop-rank.far {
+            background: var(--text-muted);
+        }
+
+        /* Trip Results Styles */
+        .trip-results-container {
+            margin-top: 1rem;
+        }
+
+        .trip-header {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .trip-route-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .trip-route-title i {
+            color: var(--accent-primary);
+        }
+
+        .trip-current-time {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .route-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .route-option {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(255,255,255,0.05);
+            overflow: hidden;
+        }
+
+        .route-option.recommended {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
+        }
+
+        .route-option-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            cursor: pointer;
+        }
+
+        .route-option-main {
+            flex: 1;
+        }
+
+        /* Journey Map Styles */
+        #journey-map-container {
+            position: relative;
+            background: var(--bg-secondary);
+        }
+
+        #journey-map {
+            width: 100%;
+            height: 100%;
+        }
+
+        #journey-overlay {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            z-index: 400;
+        }
+
+        .journey-vehicle-card {
+            background: var(--bg-tertiary);
+            border-radius: var(--radius);
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            border: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .journey-vehicle-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .journey-vehicle-info {
+            flex: 1;
+        }
+
+        .journey-vehicle-route {
+            font-weight: 600;
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .journey-vehicle-status {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .journey-vehicle-eta {
+            text-align: right;
+        }
+
+        .journey-eta-time {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--accent-primary);
+        }
+
+        .journey-eta-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        /* Recent Trips Styles */
+        .recent-trips-section {
+            margin-top: 1rem;
+        }
+
+        .recent-trip-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius);
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .recent-trip-item:hover {
+            background: var(--bg-glass);
+            transform: translateX(4px);
+        }
+
+        .recent-trip-route {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .recent-trip-from,
+        .recent-trip-to {
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .route-badge {
+            display: inline-block;
+            background: var(--accent-gradient);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+        }
+
+        .route-total-time {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .route-details {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.25rem;
+            font-size: 0.875rem;
+        }
+
+        .route-direct {
+            color: var(--success);
+        }
+
+        .route-transfers {
+            color: var(--warning);
+        }
+
+        .route-walking {
+            color: var(--text-muted);
+        }
+
+        .route-expand-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .route-expand-btn:hover {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        .route-legs {
+            padding: 0 1rem 1rem;
+        }
+
+        .route-leg {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .route-leg:last-child {
+            border-bottom: none;
+        }
+
+        .leg-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .leg-icon.walk {
+            background: var(--text-muted);
+        }
+
+        .leg-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .leg-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.9375rem;
+        }
+
+        .leg-detail {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: 0.125rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .leg-time {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .departure-time {
+            font-weight: 600;
+            color: var(--success);
+        }
+
+        .arrival-time {
+            font-weight: 600;
+            color: var(--accent-primary);
+        }
+
+        .duration {
+            color: var(--text-muted);
+        }
+
+        .transfer-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            color: var(--warning);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .nearby-stop-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .nearby-stop-name {
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 0.9375rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .nearby-stop-details {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.125rem;
+        }
+
+        .nearby-stop-distance {
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .nearby-stop-meters {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.9375rem;
+        }
+
+        .nearby-stop-time {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .recent-trip-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.875rem;
+            background: var(--bg-secondary);
+            border-radius: var(--radius);
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .recent-trip-item:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .recent-trip-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(99, 102, 241, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-primary);
+            font-size: 0.875rem;
+        }
+
+        .recent-trip-details {
+            flex: 1;
+        }
+
+        .recent-trip-route {
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 0.9375rem;
+        }
+
+        .recent-trip-time {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.125rem;
+        }
+
+        .swap-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius);
+            border: none;
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            align-self: center;
+        }
+
+        .swap-btn:hover {
+            background: var(--accent-primary);
+            color: white;
+            transform: rotate(180deg);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--accent-gradient);
+            color: white;
+            box-shadow: var(--shadow-glow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Route Result */
+        .route-result {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            padding: 1.25rem;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .route-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .route-time {
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        .route-meta {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .route-leg {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.875rem;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius);
+            margin-bottom: 0.5rem;
+        }
+
+        .leg-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .leg-info {
+            flex: 1;
+        }
+
+        .leg-route {
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .leg-stops {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .leg-duration {
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        /* Loading */
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+            gap: 1rem;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 3px solid var(--bg-tertiary);
+            border-top-color: var(--accent-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1.5rem;
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .empty-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-text {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        /* Pull to refresh hint */
+        .pull-hint {
+            text-align: center;
+            padding: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .pull-hint.visible {
+            opacity: 1;
+        }
+
+        /* Bottom Nav (Mobile) */
+        .bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding: 0.5rem 0.75rem calc(0.5rem + env(safe-area-inset-bottom));
+            z-index: 1000;
+        }
+
+        .bottom-nav-items {
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .bottom-nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            border-radius: var(--radius);
+        }
+
+        .bottom-nav-item i {
+            font-size: 1.25rem;
+        }
+
+        .bottom-nav-item.active {
+            color: var(--accent-primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                display: none;
+            }
+
+            .brand-text {
+                font-size: 1.125rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .tab-nav {
+                position: sticky;
+                top: 0;
+                z-index: 99;
+            }
+
+            .main-content {
+                margin-top: 0;
+                margin-bottom: calc(64px + env(safe-area-inset-bottom));
+            }
+
+            .bottom-nav {
+                display: block;
+            }
+
+            .vehicle-card {
+                padding: 0.875rem;
+            }
+
+            .vehicle-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 1.25rem;
+            }
+
+            .vehicle-route {
+                font-size: 1rem;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .app {
+                flex-direction: row;
+            }
+
+            .header {
+                width: 280px;
+                height: 100vh;
+                flex-direction: column;
+                align-items: stretch;
+                padding: 1.5rem;
+                border-right: 1px solid rgba(255,255,255,0.05);
+                border-bottom: none;
+            }
+
+            .main-content {
+                margin-top: 0;
+                margin-left: 280px;
+            }
+
+            .tab-nav {
+                position: sticky;
+                top: 0;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Remove animation for instant render - animation only on updates */
+        .vehicle-card.animate {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        /* Leaflet Customization */
+        .leaflet-popup-content-wrapper {
+            background: var(--bg-secondary);
+            border-radius: var(--radius);
+            color: var(--text-primary);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .leaflet-popup-tip {
+            background: var(--bg-secondary);
+        }
+
+        .leaflet-container {
+            background: var(--bg-secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="brand">
+                <div class="brand-icon">
+                    <i class="fas fa-train"></i>
+                </div>
+                <span class="brand-text">Metro Live</span>
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn" id="theme-toggle" title="Toggle theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button class="icon-btn" id="refresh-btn" title="Refresh">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Tab Navigation -->
+            <nav class="tab-nav">
+                <button class="tab-btn active" data-tab="nearby">
+                    <i class="fas fa-location-dot"></i>
+                    Nearby
+                </button>
+                <button class="tab-btn" data-tab="routes">
+                    <i class="fas fa-route"></i>
+                    Routes
+                </button>
+                <button class="tab-btn" data-tab="map">
+                    <i class="fas fa-map"></i>
+                    Map
+                </button>
+                <button class="tab-btn" data-tab="plan">
+                    <i class="fas fa-compass"></i>
+                    Plan
+                </button>
+            </nav>
+
+            <!-- Tab Content -->
+            <div class="tab-content">
+                <!-- Nearby Tab -->
+                <div class="tab-panel active" id="nearby-panel">
+                    <div class="search-container">
+                        <div class="search-bar">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="search-input" placeholder="Search routes or stops...">
+                        </div>
+                    </div>
+
+                    <!-- Alert Banner -->
+                    <div class="alert-banner" id="alert-banner" style="display: none;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div class="alert-content">
+                            <div class="alert-title" id="alert-title">Service Alert</div>
+                            <div class="alert-text" id="alert-text">Loading alerts...</div>
+                        </div>
+                    </div>
+
+                    <!-- Stats -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value train" id="stat-train">--</div>
+                            <div class="stat-label">Trains</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value tram" id="stat-tram">--</div>
+                            <div class="stat-label">Trams</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value bus" id="stat-bus">--</div>
+                            <div class="stat-label">Buses</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value total" id="stat-total">--</div>
+                            <div class="stat-label">Total</div>
+                        </div>
+                    </div>
+
+                    <!-- Vehicle List -->
+                    <div id="vehicle-list">
+                        <div class="loading-container">
+                            <div class="spinner"></div>
+                            <span class="loading-text">Loading vehicles...</span>
+                        </div>
+                    </div>
+
+                    <div class="pull-hint" id="pull-hint">
+                        <i class="fas fa-arrow-down"></i> Pull to refresh
+                    </div>
+                </div>
+
+                <!-- Routes Tab -->
+                <div class="tab-panel" id="routes-panel">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fas fa-train" style="color: var(--train);"></i>
+                                Train Lines
+                            </div>
+                        </div>
+                        <div class="card-body" id="train-routes">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fas fa-subway" style="color: var(--tram);"></i>
+                                Tram Lines
+                            </div>
+                        </div>
+                        <div class="card-body" id="tram-routes">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fas fa-bus" style="color: var(--bus);"></i>
+                                Bus Routes
+                            </div>
+                        </div>
+                        <div class="card-body" id="bus-routes">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Map Tab -->
+                <div class="tab-panel" id="map-panel">
+                    <div class="map-container">
+                        <div id="map"></div>
+                        <div class="map-overlay">
+                            <button class="filter-chip active" data-filter="all">
+                                <i class="fas fa-layer-group"></i> All
+                            </button>
+                            <button class="filter-chip" data-filter="train">
+                                <i class="fas fa-train"></i> Trains
+                            </button>
+                            <button class="filter-chip" data-filter="tram">
+                                <i class="fas fa-subway"></i> Trams
+                            </button>
+                            <button class="filter-chip" data-filter="bus">
+                                <i class="fas fa-bus"></i> Buses
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Plan Tab -->
+                <div class="tab-panel" id="plan-panel">
+                    <div class="trip-planner-container">
+                        <!-- Location Inputs -->
+                        <div class="location-inputs-card">
+                            <div class="location-input-row">
+                                <div class="location-dot origin"></div>
+                                <div class="location-input-wrapper autocomplete-container">
+                                    <input type="text" id="trip-from" placeholder="Choose starting point" autocomplete="off">
+                                    <button class="location-action-btn" id="use-current-location" title="Use my location">
+                                        <i class="fas fa-location-arrow"></i>
+                                    </button>
+                                    <div class="autocomplete-dropdown" id="from-dropdown"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="location-divider">
+                                <button class="swap-btn-enhanced" id="swap-locations" title="Swap locations">
+                                    <i class="fas fa-exchange-alt"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="location-input-row">
+                                <div class="location-dot destination"></div>
+                                <div class="location-input-wrapper autocomplete-container">
+                                    <input type="text" id="trip-to" placeholder="Choose destination" autocomplete="off">
+                                    <div class="autocomplete-dropdown" id="to-dropdown"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Quick Actions -->
+                        <div class="quick-actions">
+                            <button class="quick-action-btn" data-dest="Adelaide Railway Station">
+                                <i class="fas fa-train"></i>
+                                <span>City</span>
+                            </button>
+                            <button class="quick-action-btn" data-dest="Glenelg">
+                                <i class="fas fa-umbrella-beach"></i>
+                                <span>Glenelg</span>
+                            </button>
+                            <button class="quick-action-btn" data-dest="Rundle Mall">
+                                <i class="fas fa-shopping-bag"></i>
+                                <span>Shopping</span>
+                            </button>
+                            <button class="quick-action-btn" data-dest="Adelaide Airport">
+                                <i class="fas fa-plane"></i>
+                                <span>Airport</span>
+                            </button>
+                        </div>
+                        
+                        <!-- Nearby Stops Based on Location -->
+                        <div class="nearby-stops-section" id="nearby-stops-section">
+                            <div class="section-header">
+                                <i class="fas fa-location-arrow"></i>
+                                <span>Nearby Stops</span>
+                                <button class="refresh-location-btn" id="refresh-location" title="Refresh location">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                            <div class="location-status" id="location-status" style="display:none;">Finding your location...</div>
+                            <div class="nearby-stops-list" id="nearby-stops-list"></div>
+                        </div>
+                        
+                        <!-- Plan Button -->
+                        <button class="plan-route-btn" id="plan-trip-btn">
+                            <i class="fas fa-directions"></i>
+                            <span>Get Directions</span>
+                        </button>
+                        
+                        <!-- Recent Trips -->
+                        <div class="recent-trips-section" id="recent-trips" style="display: none;">
+                            <div class="section-header">
+                                <i class="fas fa-history"></i>
+                                <span>Recent</span>
+                            </div>
+                            <div class="recent-trips-list" id="recent-trips-list"></div>
+                        </div>
+                    </div>
+
+                    <div id="trip-results">
+                        <!-- Trip results will appear here -->
+                    </div>
+                    
+                    <!-- Notification Permission Banner -->
+                    <div id="notification-banner" style="display: none; margin: 1rem; padding: 1rem; background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: var(--radius);">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div style="width: 48px; height: 48px; background: var(--accent-gradient); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <i class="fas fa-bell" style="color: white; font-size: 1.25rem;"></i>
+                            </div>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; margin-bottom: 0.25rem;">Get Trip Notifications</div>
+                                <div style="font-size: 0.875rem; color: var(--text-secondary);">Get alerts when your bus or train is approaching</div>
+                            </div>
+                            <button onclick="requestNotificationPermission()" style="background: var(--accent-primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; flex-shrink: 0;">
+                                Enable
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Live Journey Map - EXPANDED -->
+                    <div id="journey-map-container" style="display: none; margin: 1rem; position: relative;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <span style="font-weight: 600; font-size: 0.875rem;"><i class="fas fa-map-marked-alt"></i> Live Journey Map</span>
+                            <button onclick="toggleFullscreenMap()" style="background: var(--bg-tertiary); border: none; color: var(--text-secondary); padding: 0.25rem 0.75rem; border-radius: var(--radius-sm); cursor: pointer; font-size: 0.75rem;">
+                                <i class="fas fa-expand"></i> Fullscreen
+                            </button>
+                        </div>
+                        <div id="journey-map-wrapper" style="height: 450px; border-radius: var(--radius); overflow: hidden; border: 1px solid rgba(255,255,255,0.1); position: relative;">
+                            <div id="journey-map" style="width: 100%; height: 100%;"></div>
+                            <div id="journey-overlay" style="position: absolute; top: 10px; left: 10px; right: 10px; background: var(--bg-glass); backdrop-filter: blur(10px); padding: 0.75rem; border-radius: var(--radius); border: 1px solid rgba(255,255,255,0.1);">
+                                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                    <div class="live-indicator"></div>
+                                    <span style="font-weight: 600; font-size: 0.875rem;">Live Journey Tracking</span>
+                                </div>
+                                <div id="journey-vehicle-status" style="font-size: 0.75rem; color: var(--text-secondary);">
+                                    Waiting for vehicle data...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Live Vehicle List for Journey -->
+                    <div id="journey-vehicles" style="display: none; margin: 1rem;">
+                        <div class="section-header" style="margin-bottom: 0.75rem;">
+                            <i class="fas fa-bus"></i>
+                            <span>Live Vehicles on Your Route</span>
+                        </div>
+                        <div id="journey-vehicles-list"></div>
+                    </div>
+                    
+                    <!-- Saved Trips Section -->
+                    <div id="saved-trips-section" style="margin: 1rem; display: none;">
+                        <div class="section-header" style="margin-bottom: 0.75rem;">
+                            <i class="fas fa-star"></i>
+                            <span>Saved Trips</span>
+                        </div>
+                        <div id="saved-trips-list"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Bottom Navigation (Mobile) -->
+        <nav class="bottom-nav">
+            <div class="bottom-nav-items">
+                <a href="#" class="bottom-nav-item active" data-tab="nearby">
+                    <i class="fas fa-location-dot"></i>
+                    Nearby
+                </a>
+                <a href="#" class="bottom-nav-item" data-tab="routes">
+                    <i class="fas fa-route"></i>
+                    Routes
+                </a>
+                <a href="#" class="bottom-nav-item" data-tab="map">
+                    <i class="fas fa-map"></i>
+                    Map
+                </a>
+                <a href="#" class="bottom-nav-item" data-tab="plan">
+                    <i class="fas fa-compass"></i>
+                    Plan
+                </a>
+            </div>
+        </nav>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="/static/adelaide-metro-stops.js"></script>
+    <script>
+        // State
+        let vehicles = [];
+        let routes = [];
+        let markers = {};
+        let map = null;
+        let currentTab = 'nearby';
+        let currentFilter = 'all';
+        let selectedVehicle = null;
+        let isRefreshing = false;
+        let touchStartY = 0;
+
+        const typeConfig = {
+            train: { icon: 'fa-train', color: '#3b82f6', label: 'Train' },
+            tram: { icon: 'fa-subway', color: '#06b6d4', label: 'Tram' },
+            bus: { icon: 'fa-bus', color: '#10b981', label: 'Bus' }
+        };
+
+        // Initialize
+        async function init() {
+            initTheme();
+            initTabs();
+            initMap();
+            initEventListeners();
+            renderRecentTrips();
+            
+            // Show loading overlay until ALL data is ready
+            document.getElementById('vehicle-list').innerHTML = `
+                <div class="loading-container">
+                    <div class="spinner"></div>
+                    <span class="loading-text">Loading all vehicles...</span>
+                </div>
+            `;
+            
+            // Load all data together
+            try {
+                const [routesData, vehiclesData, alertsData] = await Promise.all([
+                    fetch('/adelaide-metro/api/routes').then(r => r.json()),
+                    fetch('/adelaide-metro/api/vehicles').then(r => r.json()),
+                    fetch('/adelaide-metro/api/alerts').then(r => r.json())
+                ]);
+                
+                routes = routesData.routes || [];
+                vehicles = vehiclesData.vehicles || [];
+                
+                // Update UI only after ALL data is loaded
+                updateStats();
+                renderRoutesList();
+                renderVehicleList();
+                updateMap();
+                
+                // Show alerts if any
+                const alert = alertsData.alerts?.find(a => a.active);
+                if (alert) {
+                    document.getElementById('alert-banner').style.display = 'flex';
+                    document.getElementById('alert-title').textContent = alert.title;
+                    document.getElementById('alert-text').textContent = alert.description;
+                }
+                
+            } catch (err) {
+                console.error('Failed to load initial data:', err);
+                document.getElementById('vehicle-list').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">⚠️</div>
+                        <div class="empty-title">Failed to load</div>
+                        <div class="empty-text">Please refresh the page</div>
+                    </div>
+                `;
+            }
+
+            setInterval(fetchVehicles, 30000);
+        }
+
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+        }
+
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            updateThemeIcon(next);
+        }
+
+        function updateThemeIcon(theme) {
+            const btn = document.getElementById('theme-toggle');
+            btn.innerHTML = theme === 'dark' ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
+        }
+
+        function initTabs() {
+            document.querySelectorAll('.tab-btn, .bottom-nav-item').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const tab = btn.dataset.tab;
+                    switchTab(tab);
+                });
+            });
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-btn, .bottom-nav-item').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tab === tab);
+            });
+            document.querySelectorAll('.tab-panel').forEach(panel => {
+                panel.classList.toggle('active', panel.id === tab + '-panel');
+            });
+            if (tab === 'map' && map) {
+                setTimeout(() => map.invalidateSize(), 100);
+            }
+            // Refresh nearby stops when Plan tab is opened
+            if (tab === 'plan') {
+                setTimeout(() => {
+                    findNearbyStops();
+                }, 100);
+            }
+        }
+
+        function initMap() {
+            map = L.map('map', { center: [-34.9285, 138.6007], zoom: 12, zoomControl: false });
+            L.control.zoom({ position: 'bottomright' }).addTo(map);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap &copy; CARTO',
+                subdomains: 'abcd', maxZoom: 19
+            }).addTo(map);
+            document.querySelectorAll('.filter-chip').forEach(chip => {
+                chip.addEventListener('click', () => {
+                    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+                    chip.classList.add('active');
+                    currentFilter = chip.dataset.filter;
+                    updateMap();
+                });
+            });
+        }
+
+        let selectedAutocompleteIndex = -1;
+        let currentAutocompleteItems = [];
+
+        function initAutocomplete(inputId, dropdownId) {
+            const input = document.getElementById(inputId);
+            const dropdown = document.getElementById(dropdownId);
+            
+            input.addEventListener('input', () => {
+                const value = input.value.toLowerCase().trim();
+                selectedAutocompleteIndex = -1;
+                
+                if (value.length < 1) {
+                    dropdown.classList.remove('active');
+                    return;
+                }
+                
+                // Filter stops
+                const matches = ADELAIDE_STOPS.filter(stop => 
+                    stop.n.toLowerCase().includes(value) || 
+                    stop.i.toLowerCase().includes(value)
+                ).slice(0, 8);
+                
+                currentAutocompleteItems = matches;
+                
+                if (matches.length === 0) {
+                    dropdown.classList.remove('active');
+                    return;
+                }
+                
+                // Render dropdown
+                dropdown.innerHTML = matches.map((stop, index) => `
+                    <div class="autocomplete-item" data-index="${index}" data-value="${stop.n}" data-lat="${stop.lat}" data-lon="${stop.lon}">
+                        <div class="stop-name">${highlightMatch(stop.n, value)}</div>
+                        <div class="stop-info">${stop.i}</div>
+                    </div>
+                `).join('');
+                
+                dropdown.classList.add('active');
+                
+                // Add click handlers
+                dropdown.querySelectorAll('.autocomplete-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        input.value = item.dataset.value;
+                        dropdown.classList.remove('active');
+                    });
+                });
+            });
+            
+            // Keyboard navigation
+            input.addEventListener('keydown', (e) => {
+                if (!dropdown.classList.contains('active')) return;
+                
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    selectedAutocompleteIndex = Math.min(selectedAutocompleteIndex + 1, currentAutocompleteItems.length - 1);
+                    updateAutocompleteSelection(dropdown);
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    selectedAutocompleteIndex = Math.max(selectedAutocompleteIndex - 1, -1);
+                    updateAutocompleteSelection(dropdown);
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (selectedAutocompleteIndex >= 0) {
+                        const stop = currentAutocompleteItems[selectedAutocompleteIndex];
+                        input.value = stop.n;
+                        input.dataset.lat = stop.lat;
+                        input.dataset.lon = stop.lon;
+                        dropdown.classList.remove('active');
+                    }
+                } else if (e.key === 'Escape') {
+                    dropdown.classList.remove('active');
+                }
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.classList.remove('active');
+                }
+            });
+            
+            // Show popular stops on focus if empty
+            input.addEventListener('focus', () => {
+                if (input.value.trim().length === 0) {
+                    // Show first 6 stops from database (they're sorted by priority)
+                    currentAutocompleteItems = ADELAIDE_STOPS.slice(0, 6);
+                    dropdown.innerHTML = currentAutocompleteItems.map((stop, index) => `
+                        <div class="autocomplete-item" data-index="${index}" data-value="${stop.n}" data-lat="${stop.lat}" data-lon="${stop.lon}">
+                            <div class="stop-name">${stop.n}</div>
+                            <div class="stop-info">${stop.i}</div>
+                        </div>
+                    `).join('');
+                    dropdown.classList.add('active');
+                    
+                    dropdown.querySelectorAll('.autocomplete-item').forEach(item => {
+                        item.addEventListener('click', () => {
+                            input.value = item.dataset.value;
+                            input.dataset.lat = item.dataset.lat;
+                            input.dataset.lon = item.dataset.lon;
+                            dropdown.classList.remove('active');
+                        });
+                    });
+                }
+            });
+        }
+
+        function updateAutocompleteSelection(dropdown) {
+            const items = dropdown.querySelectorAll('.autocomplete-item');
+            items.forEach((item, index) => {
+                item.classList.toggle('selected', index === selectedAutocompleteIndex);
+            });
+            if (selectedAutocompleteIndex >= 0 && items[selectedAutocompleteIndex]) {
+                items[selectedAutocompleteIndex].scrollIntoView({ block: 'nearest' });
+            }
+        }
+
+        function highlightMatch(text, query) {
+            const regex = new RegExp(`(${escapeRegex(query)})`, 'gi');
+            return text.replace(regex, '<mark style="background: var(--accent-primary); color: white; padding: 0 2px; border-radius: 2px;">$1</mark>');
+        }
+
+        function escapeRegex(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+
+        function initEventListeners() {
+            document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+            document.getElementById('refresh-btn').addEventListener('click', () => fetchVehicles(true));
+            document.getElementById('search-input').addEventListener('input', (e) => filterVehicles(e.target.value));
+            document.getElementById('plan-trip-btn').addEventListener('click', planTrip);
+            document.getElementById('swap-locations').addEventListener('click', swapLocations);
+            
+            // Initialize autocomplete for trip planner
+            initAutocomplete('trip-from', 'from-dropdown');
+            initAutocomplete('trip-to', 'to-dropdown');
+            
+            const nearbyPanel = document.getElementById('nearby-panel');
+            nearbyPanel.addEventListener('touchstart', (e) => { touchStartY = e.touches[0].clientY; }, { passive: true });
+            nearbyPanel.addEventListener('touchmove', (e) => {
+                const diff = e.touches[0].clientY - touchStartY;
+                if (diff > 80 && nearbyPanel.scrollTop === 0 && !isRefreshing) {
+                    document.getElementById('pull-hint').classList.add('visible');
+                }
+            }, { passive: true });
+            nearbyPanel.addEventListener('touchend', (e) => {
+                const diff = e.changedTouches[0].clientY - touchStartY;
+                if (diff > 100 && nearbyPanel.scrollTop === 0 && !isRefreshing) fetchVehicles(true);
+                document.getElementById('pull-hint').classList.remove('visible');
+            });
+            
+            // Initialize nearby stops when Plan tab is opened
+            initNearbyStops();
+        }
+
+        // Initialize Nearby Stops Feature
+        function initNearbyStops() {
+            const locationStatus = document.getElementById('location-status');
+            const refreshBtn = document.getElementById('refresh-location');
+            
+            if (locationStatus) {
+                locationStatus.addEventListener('click', findNearbyStops);
+            }
+            
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', findNearbyStops);
+            }
+            
+            // Clear any cached location - always get fresh data
+            userLocation = null;
+            
+            // Show loading state
+            if (locationStatus) {
+                locationStatus.textContent = 'Finding your location...';
+                locationStatus.style.display = 'block';
+                locationStatus.classList.add('locating');
+            }
+            
+            // Always request fresh location on init (no caching)
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        userLocation = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+                        console.log('Fresh GPS location:', userLocation);
+                        renderNearbyStops(userLocation.lat, userLocation.lon);
+                    },
+                    (err) => { 
+                        console.log('GPS failed:', err.message);
+                        // Show default Adelaide CBD stops
+                        renderNearbyStops(-34.9285, 138.6007);
+                        if (locationStatus) {
+                            locationStatus.textContent = 'Tap to find stops near your location';
+                            locationStatus.classList.remove('locating');
+                            locationStatus.style.display = 'block';
+                        }
+                    },
+                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                );
+            } else {
+                // No geolocation support - show CBD stops
+                renderNearbyStops(-34.9285, 138.6007);
+                if (locationStatus) {
+                    locationStatus.textContent = 'Geolocation not supported';
+                    locationStatus.classList.remove('locating');
+                    locationStatus.style.display = 'block';
+                }
+            }
+        }
+        
+        // Find nearby stops based on GPS - always fresh
+        function findNearbyStops() {
+            const locationStatus = document.getElementById('location-status');
+            const refreshBtn = document.getElementById('refresh-location');
+            const stopsList = document.getElementById('nearby-stops-list');
+            
+            if (!navigator.geolocation) {
+                locationStatus.textContent = 'Geolocation not supported';
+                return;
+            }
+            
+            // Clear previous results
+            stopsList.innerHTML = '';
+            locationStatus.style.display = 'block';
+            locationStatus.textContent = 'Getting your location...';
+            locationStatus.classList.add('locating');
+            if (refreshBtn) refreshBtn.classList.add('spinning');
+            
+            // Force fresh GPS read - no caching
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    userLocation = {
+                        lat: position.coords.latitude,
+                        lon: position.coords.longitude
+                    };
+                    console.log('Manual refresh GPS:', userLocation);
+                    renderNearbyStops(userLocation.lat, userLocation.lon);
+                    locationStatus.classList.remove('locating');
+                    if (refreshBtn) refreshBtn.classList.remove('spinning');
+                },
+                (error) => {
+                    locationStatus.textContent = 'Tap to try again';
+                    locationStatus.classList.remove('locating');
+                    if (refreshBtn) refreshBtn.classList.remove('spinning');
+                    console.error('Geolocation error:', error);
+                },
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+            );
+        }
+        
+        // Calculate distance between two points in meters
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371000; // Earth's radius in meters
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+        
+        // Estimate walking time (minutes)
+        function estimateWalkingTime(meters) {
+            const walkingSpeed = 1.4; // meters per second (5 km/h)
+            const seconds = meters / walkingSpeed;
+            return Math.ceil(seconds / 60);
+        }
+        
+        // Render nearby stops list
+        function renderNearbyStops(userLat, userLon) {
+            const locationStatus = document.getElementById('location-status');
+            const stopsList = document.getElementById('nearby-stops-list');
+            
+            console.log('Rendering nearby stops for:', userLat, userLon);
+            
+            // Validate coordinates
+            if (!userLat || !userLon || isNaN(userLat) || isNaN(userLon)) {
+                if (locationStatus) {
+                    locationStatus.textContent = 'Invalid location. Tap to try again.';
+                    locationStatus.style.display = 'block';
+                }
+                return;
+            }
+            
+            // Check if coordinates are within Adelaide metro bounds
+            const isInAdelaide = (
+                userLat >= -35.3 && userLat <= -34.5 &&
+                userLon >= 138.4 && userLon <= 138.9
+            );
+            
+            // Calculate distances and sort
+            const stopsWithDistance = ADELAIDE_STOPS.map(stop => {
+                const distance = calculateDistance(userLat, userLon, stop.lat, stop.lon);
+                return { ...stop, distance };
+            }).sort((a, b) => a.distance - b.distance);
+            
+            // Get top 5 nearest
+            const nearest = stopsWithDistance.slice(0, 5);
+            
+            console.log('Found', nearest.length, 'nearest stops');
+            console.log('Closest:', nearest[0]?.n, nearest[0]?.distance + 'm');
+            
+            // Update status - hide it since we have results
+            if (locationStatus) {
+                locationStatus.style.display = 'none';
+            }
+            
+            // Render stops
+            if (nearest.length === 0) {
+                stopsList.innerHTML = '<div style="text-align:center;padding:1rem;color:var(--text-muted)">No stops found nearby</div>';
+                return;
+            }
+            
+            // Add location info header
+            let locationInfo = '';
+            if (!isInAdelaide) {
+                locationInfo = `<div style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:8px;padding:0.75rem;margin-bottom:0.75rem;font-size:0.875rem;color:var(--warning)">
+                    <i class="fas fa-exclamation-triangle"></i> You appear to be outside Adelaide metro area. Showing nearest stops anyway.
+                </div>`;
+            }
+            
+            stopsList.innerHTML = locationInfo + nearest.map((stop, index) => {
+                const walkingTime = estimateWalkingTime(stop.distance);
+                const distanceText = stop.distance < 1000 
+                    ? `${Math.round(stop.distance)}m` 
+                    : `${(stop.distance/1000).toFixed(1)}km`;
+                
+                // Color code based on distance
+                let rankClass = 'far';
+                let distanceColor = 'var(--text-muted)';
+                if (stop.distance < 500) {
+                    rankClass = 'walking';
+                    distanceColor = 'var(--success)';
+                } else if (stop.distance < 1500) {
+                    rankClass = 'biking';
+                    distanceColor = 'var(--warning)';
+                }
+                
+                return `
+                    <div class="nearby-stop-item" onclick="selectNearbyStop('${stop.n.replace(/'/g, "\\'")}', ${stop.lat}, ${stop.lon})" style="animation: slideIn 0.3s ease ${index * 0.1}s both;">
+                        <div class="nearby-stop-rank ${rankClass}">${index + 1}</div>
+                        <div class="nearby-stop-info">
+                            <div class="nearby-stop-name">${stop.n}</div>
+                            <div class="nearby-stop-details">${stop.i}</div>
+                        </div>
+                        <div class="nearby-stop-distance">
+                            <div class="nearby-stop-meters" style="color:${distanceColor}">${distanceText}</div>
+                            <div class="nearby-stop-time">${walkingTime} min walk</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Select a nearby stop as starting point
+        function selectNearbyStop(name, lat, lon) {
+            const fromInput = document.getElementById('trip-from');
+            fromInput.value = name;
+            fromInput.dataset.lat = lat;
+            fromInput.dataset.lon = lon;
+            fromInput.dataset.isCurrentLocation = 'false';
+            
+            // Scroll to trip inputs
+            document.querySelector('.location-inputs-card').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Add slide-in animation
+        document.head.insertAdjacentHTML('beforeend', `
+            <style>
+                @keyframes slideIn {
+                    from { opacity: 0; transform: translateX(-10px); }
+                    to { opacity: 1; transform: translateX(0); }
+                }
+                
+                @keyframes pulse {
+                    0%, 100% { transform: scale(1); opacity: 1; }
+                    50% { transform: scale(1.1); opacity: 0.9; }
+                }
+                
+                .live-indicator {
+                    width: 8px;
+                    height: 8px;
+                    background: var(--success);
+                    border-radius: 50%;
+                    animation: pulse 2s infinite;
+                    display: inline-block;
+                    margin-right: 0.5rem;
+                }
+                
+                .journey-status {
+                    margin: 0.5rem 1rem;
+                    padding: 0.75rem;
+                    background: var(--bg-tertiary);
+                    border-radius: var(--radius);
+                    font-size: 0.875rem;
+                }
+                
+                .track-route-btn {
+                    background: var(--accent-primary);
+                    color: white;
+                    border: none;
+                    padding: 0.5rem 1rem;
+                    border-radius: var(--radius-sm);
+                    font-weight: 600;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    margin-right: 0.5rem;
+                    transition: all 0.2s;
+                }
+                
+                .track-route-btn:hover {
+                    transform: translateY(-1px);
+                    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+                }
+                
+                .route-option {
+                    border-left: 4px solid var(--accent-primary);
+                    transition: all 0.3s ease;
+                }
+                
+                .route-option:hover {
+                    transform: translateX(4px);
+                }
+            </style>
+        `);
+
+        async function fetchRoutes() {
+            try {
+                const res = await fetch('/adelaide-metro/api/routes');
+                const data = await res.json();
+                routes = data.routes || [];
+                renderRoutesList();
+            } catch (err) { console.error('Failed to fetch routes:', err); }
+        }
+
+        async function fetchVehicles(showLoading = false) {
+            if (isRefreshing) return;
+            isRefreshing = true;
+            document.getElementById('refresh-btn').classList.add('active');
+            try {
+                const res = await fetch('/adelaide-metro/api/vehicles');
+                const data = await res.json();
+                vehicles = data.vehicles || [];
+                updateStats();
+                renderVehicleList();
+                updateMap();
+            } catch (err) { console.error('Failed to fetch vehicles:', err); }
+            finally { isRefreshing = false; document.getElementById('refresh-btn').classList.remove('active'); }
+        }
+
+        async function fetchAlerts() {
+            try {
+                const res = await fetch('/adelaide-metro/api/alerts');
+                const data = await res.json();
+                const alert = data.alerts?.find(a => a.active);
+                if (alert) {
+                    document.getElementById('alert-banner').style.display = 'flex';
+                    document.getElementById('alert-title').textContent = alert.title;
+                    document.getElementById('alert-text').textContent = alert.description;
+                }
+            } catch (err) { console.error('Failed to fetch alerts:', err); }
+        }
+
+        function updateStats() {
+            const counts = { train: 0, tram: 0, bus: 0 };
+            vehicles.forEach(v => counts[v.type]++);
+            document.getElementById('stat-train').textContent = counts.train;
+            document.getElementById('stat-tram').textContent = counts.tram;
+            document.getElementById('stat-bus').textContent = counts.bus;
+            document.getElementById('stat-total').textContent = vehicles.length;
+        }
+
+        function renderVehicleList(filterText = '') {
+            const container = document.getElementById('vehicle-list');
+            
+            let filtered = vehicles;
+            if (filterText) {
+                const lower = filterText.toLowerCase();
+                filtered = vehicles.filter(v => v.route_name.toLowerCase().includes(lower) || v.destination.toLowerCase().includes(lower) || v.next_stop.toLowerCase().includes(lower));
+            }
+            
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-title">No vehicles found</div><div class="empty-text">Try adjusting your search</div></div>';
+                return;
+            }
+            
+            // Sort by type first (train, tram, bus), then by arrival time
+            filtered.sort((a, b) => {
+                const typeOrder = { train: 0, tram: 1, bus: 2 };
+                const typeDiff = typeOrder[a.type] - typeOrder[b.type];
+                if (typeDiff !== 0) return typeDiff;
+                return a.arrival_minutes - b.arrival_minutes;
+            });
+            
+            // Build HTML string completely before inserting
+            const html = filtered.map(v => {
+                const config = typeConfig[v.type];
+                const isSoon = v.arrival_minutes <= 2;
+                return `<div class="vehicle-card ${v.type}" onclick="selectVehicle('${v.id}')"><div class="vehicle-header"><div class="vehicle-icon ${v.type}"><i class="fas ${config.icon}" style="color: ${config.color}"></i></div><div class="vehicle-info"><div class="vehicle-route">${v.route_name}<span class="status-badge ${v.status}">${v.status}</span></div><div class="vehicle-destination">To ${v.destination}</div></div><div class="arrival-time ${isSoon ? 'soon' : ''}">${v.arrival_minutes}m</div></div><div class="vehicle-details"><div class="detail-item"><i class="fas fa-map-marker-alt"></i>Next: ${v.next_stop}</div><div class="detail-item"><i class="fas fa-tachometer-alt"></i>${v.speed} km/h</div></div></div>`;
+            }).join('');
+            
+            // Single DOM update
+            container.innerHTML = html;
+        }
+
+        function renderRoutesList() {
+            const trains = routes.filter(r => r.type === 'train');
+            const trams = routes.filter(r => r.type === 'tram');
+            const buses = routes.filter(r => r.type === 'bus');
+            document.getElementById('train-routes').innerHTML = trains.map(r => `<div class="route-leg" style="margin-bottom: 0.5rem;"><div class="leg-icon" style="background: ${r.color}20;"><i class="fas fa-train" style="color: ${r.color}"></i></div><div class="leg-info"><div class="leg-route">${r.name}</div><div class="leg-stops">To ${r.destinations.join(', ')}</div></div></div>`).join('');
+            document.getElementById('tram-routes').innerHTML = trams.map(r => `<div class="route-leg" style="margin-bottom: 0.5rem;"><div class="leg-icon" style="background: ${r.color}20;"><i class="fas fa-subway" style="color: ${r.color}"></i></div><div class="leg-info"><div class="leg-route">${r.name}</div><div class="leg-stops">To ${r.destinations.join(', ')}</div></div></div>`).join('');
+            document.getElementById('bus-routes').innerHTML = buses.map(r => `<div class="route-leg" style="margin-bottom: 0.5rem;"><div class="leg-icon" style="background: ${r.color || '#10b981'}20;"><i class="fas fa-bus" style="color: ${r.color || '#10b981'}"></i></div><div class="leg-info"><div class="leg-route">${r.name}</div><div class="leg-stops">To ${r.destinations.join(', ')}</div></div></div>`).join('');
+        }
+
+        function updateMap() {
+            if (!map) return;
+            const filtered = currentFilter === 'all' ? vehicles : vehicles.filter(v => v.type === currentFilter);
+            Object.keys(markers).forEach(id => { if (!filtered.find(v => v.id === id)) { map.removeLayer(markers[id]); delete markers[id]; }});
+            filtered.forEach(v => {
+                const config = typeConfig[v.type];
+                if (markers[v.id]) { markers[v.id].setLatLng([v.lat, v.lon]); }
+                else {
+                    const icon = L.divIcon({ html: `<div style="width: 36px; height: 36px; background: ${config.color}; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 0 2px ${config.color}, 0 4px 12px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; color: white; font-size: 14px;"><i class="fas ${config.icon}"></i></div>`, className: 'vehicle-marker', iconSize: [36, 36], iconAnchor: [18, 18] });
+                    markers[v.id] = L.marker([v.lat, v.lon], { icon }).addTo(map).bindPopup(`<div style="font-family: Inter, sans-serif; min-width: 180px;"><div style="font-weight: 700; font-size: 16px; margin-bottom: 4px;">${v.route_name}</div><div style="color: #64748b; font-size: 13px;">To: ${v.destination}<br>Next: ${v.next_stop}<br>Arriving: ${v.arrival_minutes} min</div></div>`);
+                }
+            });
+        }
+
+        function filterVehicles(text) { renderVehicleList(text); }
+
+        function selectVehicle(id) {
+            selectedVehicle = vehicles.find(v => v.id === id);
+            if (selectedVehicle) { switchTab('map'); map.setView([selectedVehicle.lat, selectedVehicle.lon], 16); if (markers[id]) markers[id].openPopup(); }
+        }
+
+        function swapLocations() { 
+            const from = document.getElementById('trip-from'); 
+            const to = document.getElementById('trip-to'); 
+            const temp = from.value; 
+            from.value = to.value; 
+            to.value = temp;
+            // Also swap data attributes
+            const tempLat = from.dataset.lat;
+            const tempLon = from.dataset.lon;
+            from.dataset.lat = to.dataset.lat;
+            from.dataset.lon = to.dataset.lon;
+            to.dataset.lat = tempLat;
+            to.dataset.lon = tempLon;
+        }
+
+        // Get current time in Adelaide timezone
+        function getAdelaideTime() {
+            return new Date().toLocaleTimeString('en-AU', { 
+                timeZone: 'Australia/Adelaide',
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: false 
+            });
+        }
+
+        // Add minutes to a time string (HH:MM)
+        function addMinutes(timeStr, minutes) {
+            const [hours, mins] = timeStr.split(':').map(Number);
+            const totalMins = hours * 60 + mins + minutes;
+            const newHours = Math.floor(totalMins / 60) % 24;
+            const newMins = totalMins % 60;
+            return `${String(newHours).padStart(2, '0')}:${String(newMins).padStart(2, '0')}`;
+        }
+
+        // Comprehensive trip planner
+        async function planTrip() {
+            const fromInput = document.getElementById('trip-from');
+            const toInput = document.getElementById('trip-to');
+            const from = fromInput.value; 
+            const to = toInput.value;
+            
+            if (!from || !to) { 
+                alert('Please enter both locations'); 
+                return; 
+            }
+            
+            const container = document.getElementById('trip-results');
+            container.innerHTML = '<div class="loading-container"><div class="spinner"></div><div class="loading-text">Finding best routes...</div></div>';
+            
+            // Find the stops
+            const fromStop = ADELAIDE_STOPS.find(s => s.n === from) || findNearestStopByName(from);
+            const toStop = ADELAIDE_STOPS.find(s => s.n === to) || findNearestStopByName(to);
+            
+            if (!fromStop || !toStop) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-icon">📍</div><div class="empty-title">Stops not found</div><div class="empty-text">Please select valid stops from the suggestions</div></div>';
+                return;
+            }
+            
+            // Generate comprehensive route options
+            const routes = generateRoutes(fromStop, toStop);
+            
+            if (routes.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-icon">🤷</div><div class="empty-title">No routes found</div><div class="empty-text">Try different locations or check if stops are in the same area</div></div>';
+                return;
+            }
+            
+            // Render results
+            renderTripResults(container, routes, fromStop, toStop);
+            
+            // Save to recent trips
+            saveRecentTrip(from, to);
+        }
+
+        // Save recent trip to localStorage
+        function saveRecentTrip(from, to) {
+            try {
+                let trips = JSON.parse(localStorage.getItem('adelaideMetroRecentTrips') || '[]');
+                
+                // Remove duplicate if exists
+                trips = trips.filter(t => !(t.from === from && t.to === to));
+                
+                // Add to beginning
+                trips.unshift({ from, to, timestamp: Date.now() });
+                
+                // Keep only last 5
+                trips = trips.slice(0, 5);
+                
+                localStorage.setItem('adelaideMetroRecentTrips', JSON.stringify(trips));
+                
+                // Update UI if recent trips section exists
+                renderRecentTrips();
+            } catch (e) {
+                console.log('Could not save recent trip:', e);
+            }
+        }
+
+        // Render recent trips
+        function renderRecentTrips() {
+            const container = document.getElementById('recent-trips');
+            const list = document.getElementById('recent-trips-list');
+            if (!container || !list) return;
+            
+            try {
+                const trips = JSON.parse(localStorage.getItem('adelaideMetroRecentTrips') || '[]');
+                
+                if (trips.length === 0) {
+                    container.style.display = 'none';
+                    return;
+                }
+                
+                container.style.display = 'block';
+                list.innerHTML = trips.map(trip => `
+                    <div class="recent-trip-item" onclick="loadRecentTrip('${trip.from.replace(/'/g, "\\'")}', '${trip.to.replace(/'/g, "\\'")}')">
+                        <div class="recent-trip-route">
+                            <span class="recent-trip-from">${trip.from}</span>
+                            <i class="fas fa-arrow-right"></i>
+                            <span class="recent-trip-to">${trip.to}</span>
+                        </div>
+                        <i class="fas fa-chevron-right" style="color: var(--text-muted);"></i>
+                    </div>
+                `).join('');
+            } catch (e) {
+                console.log('Could not render recent trips:', e);
+            }
+        }
+
+        // Load a recent trip
+        function loadRecentTrip(from, to) {
+            document.getElementById('trip-from').value = from;
+            document.getElementById('trip-to').value = to;
+            planTrip();
+        }
+
+        // Find nearest stop by partial name match
+        function findNearestStopByName(name) {
+            const lower = name.toLowerCase();
+            return ADELAIDE_STOPS.find(s => 
+                s.n.toLowerCase().includes(lower) || 
+                lower.includes(s.n.toLowerCase())
+            );
+        }
+
+        // Generate multiple route options between two stops
+        function generateRoutes(fromStop, toStop) {
+            const routes = [];
+            const currentTime = getAdelaideTime();
+            
+            // Calculate straight-line distance
+            const directDistance = calculateDistance(fromStop.lat, fromStop.lon, toStop.lat, toStop.lon);
+            
+            // Option 1: Direct service (if same route/line)
+            const directRoute = findDirectRoute(fromStop, toStop, currentTime);
+            if (directRoute) {
+                routes.push(directRoute);
+            }
+            
+            // Option 2: Walk to nearby stops and find better connections
+            const nearbyFrom = getNearbyStops(fromStop.lat, fromStop.lon, 3, 800); // 3 stops within 800m
+            const nearbyTo = getNearbyStops(toStop.lat, toStop.lon, 3, 800);
+            
+            // Try combinations of nearby stops
+            for (const altFrom of nearbyFrom) {
+                for (const altTo of nearbyTo) {
+                    if (altFrom.n === altTo.n) continue;
+                    
+                    const route = findDirectRoute(altFrom, altTo, addMinutes(currentTime, estimateWalkingTime(altFrom.walkDistance) + 2));
+                    if (route) {
+                        // Add walking legs
+                        route.legs.unshift({
+                            type: 'walk',
+                            from: fromStop.n,
+                            to: altFrom.n,
+                            distance: altFrom.walkDistance,
+                            duration: estimateWalkingTime(altFrom.walkDistance),
+                            instruction: `Walk ${Math.round(altFrom.walkDistance)}m to ${altFrom.n}`
+                        });
+                        route.legs.push({
+                            type: 'walk',
+                            from: altTo.n,
+                            to: toStop.n,
+                            distance: altTo.walkDistance,
+                            duration: estimateWalkingTime(altTo.walkDistance),
+                            instruction: `Walk ${Math.round(altTo.walkDistance)}m to ${toStop.n}`
+                        });
+                        route.totalTime += route.legs[0].duration + route.legs[route.legs.length - 1].duration;
+                        route.walkingDistance = altFrom.walkDistance + altTo.walkDistance;
+                        routes.push(route);
+                    }
+                }
+            }
+            
+            // Option 3: Simple walking route for short distances
+            if (directDistance < 2000) {
+                routes.push({
+                    type: 'walk',
+                    totalTime: estimateWalkingTime(directDistance),
+                    walkingDistance: directDistance,
+                    transfers: 0,
+                    legs: [{
+                        type: 'walk',
+                        from: fromStop.n,
+                        to: toStop.n,
+                        distance: directDistance,
+                        duration: estimateWalkingTime(directDistance),
+                        instruction: `Walk ${Math.round(directDistance)}m from ${fromStop.n} to ${toStop.n}`
+                    }]
+                });
+            }
+            
+            // Sort by total time and remove duplicates
+            routes.sort((a, b) => a.totalTime - b.totalTime);
+            
+            // Remove duplicate routes (same stops)
+            const seen = new Set();
+            return routes.filter(r => {
+                const key = r.legs.map(l => l.from + '-' + l.to).join('|');
+                if (seen.has(key)) return false;
+                seen.add(key);
+                return true;
+            }).slice(0, 3); // Top 3 routes
+        }
+
+        // Find direct route between two stops
+        function findDirectRoute(from, to, startTime) {
+            // Determine likely service type based on stop names
+            const isTrain = from.n.includes('Railway Station') || to.n.includes('Railway Station');
+            const isTram = from.n.includes('Tram Stop') || to.n.includes('Tram Stop');
+            
+            // Get distance
+            const distance = calculateDistance(from.lat, from.lon, to.lat, to.lon);
+            
+            // Estimate travel time (buses average 20km/h including stops)
+            const travelTime = Math.max(5, Math.round(distance / 1000 / 20 * 60));
+            const endTime = addMinutes(startTime, travelTime);
+            
+            let route, icon, color;
+            if (isTrain) {
+                route = getTrainRoute(from, to);
+                icon = 'fa-train';
+                color = 'var(--train)';
+            } else if (isTram) {
+                route = getTramRoute(from, to);
+                icon = 'fa-subway';
+                color = 'var(--tram)';
+            } else {
+                route = getBusRoute(from, to);
+                icon = 'fa-bus';
+                color = 'var(--bus)';
+            }
+            
+            if (!route) return null;
+            
+            return {
+                type: 'transit',
+                totalTime: travelTime + 5, // Add waiting time
+                walkingDistance: 0,
+                transfers: 0,
+                legs: [{
+                    type: 'transit',
+                    mode: isTrain ? 'train' : isTram ? 'tram' : 'bus',
+                    route: route,
+                    from: from.n,
+                    to: to.n,
+                    departure: startTime,
+                    arrival: endTime,
+                    duration: travelTime,
+                    icon: icon,
+                    color: color,
+                    stops: [`Board at ${from.n}`, `Alight at ${to.n}`]
+                }]
+            };
+        }
+
+        // Get nearby stops within distance
+        function getNearbyStops(lat, lon, count, maxDistance) {
+            const withDistance = ADELAIDE_STOPS.map(s => ({
+                ...s,
+                walkDistance: calculateDistance(lat, lon, s.lat, s.lon)
+            })).filter(s => s.walkDistance <= maxDistance && s.walkDistance > 0)
+              .sort((a, b) => a.walkDistance - b.walkDistance);
+            
+            return withDistance.slice(0, count);
+        }
+
+        // Determine train route
+        function getTrainRoute(from, to) {
+            const lines = ['Belair', 'Gawler', 'Seaford', 'Flinders', 'Outer Harbor', 'Grange', 'Tonsley'];
+            const fromLine = lines.find(l => from.n.toLowerCase().includes(l.toLowerCase()));
+            const toLine = lines.find(l => to.n.toLowerCase().includes(l.toLowerCase()));
+            
+            if (fromLine && toLine && fromLine === toLine) {
+                return `${fromLine} Line`;
+            }
+            if (from.n.includes('Railway') && to.n.includes('Railway')) {
+                return 'Train';
+            }
+            return null;
+        }
+
+        // Determine tram route
+        function getTramRoute(from, to) {
+            if (from.n.includes('Botanic') || to.n.includes('Botanic')) {
+                return 'Botanic Tram';
+            }
+            if (from.n.includes('Glenelg') || to.n.includes('Glenelg') || from.n.includes('Moseley') || to.n.includes('Moseley')) {
+                return 'Glenelg Tram';
+            }
+            if (from.n.includes('Entertainment') || to.n.includes('Entertainment')) {
+                return 'Entertainment Centre Tram';
+            }
+            return 'Tram';
+        }
+
+        // Determine bus route
+        function getBusRoute(from, to) {
+            // Try to extract route number from stop name
+            const match = from.n.match(/Stop\s+(\d+)/);
+            if (match) {
+                return `Bus (via Stop ${match[1]})`;
+            }
+            return 'Bus Service';
+        }
+
+        // Render trip results
+        function renderTripResults(container, routes, fromStop, toStop) {
+            const currentTime = getAdelaideTime();
+            
+            let html = `<div class="trip-results-container">
+                <div class="trip-header">
+                    <div class="trip-route-title">${fromStop.n} <i class="fas fa-arrow-right"></i> ${toStop.n}</div>
+                    <div class="trip-current-time">Leaving now: ${currentTime}</div>
+                </div>
+                <div id="journey-status" class="journey-status" style="margin: 0.5rem 1rem; padding: 0.75rem; background: var(--bg-tertiary); border-radius: var(--radius); font-size: 0.875rem; display: none;"></div>
+                <div class="route-options">`;
+            
+            routes.forEach((route, index) => {
+                const isRecommended = index === 0;
+                const badge = isRecommended ? '<span class="route-badge recommended">Best</span>' : '';
+                const totalTime = route.totalTime;
+                const hours = Math.floor(totalTime / 60);
+                const mins = totalTime % 60;
+                const timeText = hours > 0 ? `${hours}h ${mins}m` : `${mins} min`;
+                
+                html += `
+                    <div class="route-option ${isRecommended ? 'recommended' : ''}">
+                        <div class="route-option-header">
+                            <div class="route-option-main">
+                                ${badge}
+                                <div class="route-total-time">${timeText}</div>
+                                <div class="route-details">
+                                    ${route.transfers > 0 ? `<span class="route-transfers"><i class="fas fa-exchange-alt"></i> ${route.transfers} transfer${route.transfers > 1 ? 's' : ''}</span>` : '<span class="route-direct"><i class="fas fa-check"></i> Direct</span>'}
+                                    ${route.walkingDistance > 0 ? `<span class="route-walking"><i class="fas fa-walking"></i> ${Math.round(route.walkingDistance)}m walk</span>` : ''}
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center;">
+                                <button class="track-route-btn" onclick="trackThisRoute(${index})">
+                                    <i class="fas fa-map-marked-alt"></i> Track
+                                </button>
+                                <button class="route-expand-btn" onclick="toggleRoute(${index})">
+                                    <i class="fas fa-chevron-down" id="route-icon-${index}"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="route-legs" id="route-legs-${index}" style="${isRecommended ? '' : 'display:none;'}">`;
+                
+                route.legs.forEach((leg, legIndex) => {
+                    if (leg.type === 'walk') {
+                        html += `
+                            <div class="route-leg walk-leg">
+                                <div class="leg-icon walk"><i class="fas fa-walking"></i></div>
+                                <div class="leg-content">
+                                    <div class="leg-title">Walk ${Math.round(leg.distance)}m</div>
+                                    <div class="leg-detail">${leg.from} <i class="fas fa-arrow-right"></i> ${leg.to}</div>
+                                    <div class="leg-time">${leg.duration} min</div>
+                                </div>
+                            </div>`;
+                    } else {
+                        html += `
+                            <div class="route-leg transit-leg">
+                                <div class="leg-icon" style="background: ${leg.color}"><i class="fas ${leg.icon}"></i></div>
+                                <div class="leg-content">
+                                    <div class="leg-title">${leg.route}</div>
+                                    <div class="leg-detail">${leg.from} <i class="fas fa-arrow-right"></i> ${leg.to}</div>
+                                    <div class="leg-time">
+                                        <span class="departure-time">${leg.departure}</span>
+                                        <i class="fas fa-long-arrow-alt-right"></i>
+                                        <span class="arrival-time">${leg.arrival}</span>
+                                        <span class="duration">(${leg.duration} min)</span>
+                                    </div>
+                                </div>
+                            </div>`;
+                    }
+                    
+                    // Add transfer indicator if not last leg
+                    if (legIndex < route.legs.length - 1 && route.legs[legIndex + 1].type === 'transit') {
+                        html += `<div class="transfer-indicator"><i class="fas fa-exchange-alt"></i> Transfer</div>`;
+                    }
+                });
+                
+                html += `</div></div>`;
+            });
+            
+            html += `</div></div>`;
+            container.innerHTML = html;
+        }
+
+        // Toggle route details
+        function toggleRoute(index) {
+            const legs = document.getElementById(`route-legs-${index}`);
+            const icon = document.getElementById(`route-icon-${index}`);
+            if (legs.style.display === 'none') {
+                legs.style.display = 'block';
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-up');
+            } else {
+                legs.style.display = 'none';
+                icon.classList.remove('fa-chevron-up');
+                icon.classList.add('fa-chevron-down');
+            }
+        }
+
+        // Global variables for route tracking
+        let activeRoutePolyline = null;
+        let trackedRouteVehicles = {};
+        let routeTrackingInterval = null;
+        let activeJourney = null;
+
+        // Start tracking vehicles for a route
+        function startRouteTracking(fromStop, toStop, routeInfo) {
+            // Clear previous tracking
+            stopRouteTracking();
+            
+            activeJourney = {
+                from: fromStop,
+                to: toStop,
+                route: routeInfo,
+                startTime: Date.now()
+            };
+            
+            // Draw the route
+            drawRouteOnMap(fromStop, toStop, routeInfo.color);
+            
+            // Immediately fetch and display vehicles
+            updateTrackedVehicles();
+            
+            // Start auto-refresh
+            routeTrackingInterval = setInterval(updateTrackedVehicles, 10000);
+        }
+
+        // Stop route tracking
+        function stopRouteTracking() {
+            if (routeTrackingInterval) {
+                clearInterval(routeTrackingInterval);
+                routeTrackingInterval = null;
+            }
+            
+            // Remove tracked vehicle markers
+            Object.values(trackedRouteVehicles).forEach(marker => {
+                map.removeLayer(marker);
+            });
+            trackedRouteVehicles = {};
+            
+            activeJourney = null;
+        }
+
+        // Draw route on map
+        function drawRouteOnMap(fromStop, toStop, color) {
+            // Clear existing route
+            if (activeRoutePolyline) {
+                map.removeLayer(activeRoutePolyline);
+            }
+            
+            // Create a line between stops
+            const latlngs = [
+                [fromStop.lat, fromStop.lon],
+                [toStop.lat, toStop.lon]
+            ];
+            
+            activeRoutePolyline = L.polyline(latlngs, {
+                color: color,
+                weight: 4,
+                opacity: 0.8,
+                dashArray: '10, 10',
+                lineCap: 'round'
+            }).addTo(map);
+            
+            // Fit map to show the route
+            map.fitBounds(activeRoutePolyline.getBounds(), { padding: [50, 50] });
+        }
+
+        // Update tracked vehicles on map
+        async function updateTrackedVehicles() {
+            if (!activeJourney) return;
+            
+            try {
+                const res = await fetch('/adelaide-metro/api/vehicles');
+                const data = await res.json();
+                const vehicles = data.vehicles || [];
+                
+                // Find vehicles near the route
+                const routeVehicles = vehicles.filter(v => {
+                    const nearFrom = calculateDistance(
+                        activeJourney.from.lat, activeJourney.from.lon,
+                        v.lat, v.lon
+                    ) < 2; // Within 2km
+                    return nearFrom;
+                });
+                
+                // Update or create markers
+                routeVehicles.forEach(v => {
+                    if (trackedRouteVehicles[v.id]) {
+                        trackedRouteVehicles[v.id].setLatLng([v.lat, v.lon]);
+                    } else {
+                        const icon = L.divIcon({
+                            html: `<div style="
+                                width: 44px; height: 44px; 
+                                background: ${v.type === 'train' ? '#3b82f6' : v.type === 'tram' ? '#06b6d4' : '#10b981'}; 
+                                border-radius: 50%; 
+                                border: 4px solid white; 
+                                box-shadow: 0 0 0 3px ${v.type === 'train' ? '#3b82f6' : v.type === 'tram' ? '#06b6d4' : '#10b981'}, 0 0 20px rgba(99, 102, 241, 0.6); 
+                                display: flex; align-items: center; justify-content: center; 
+                                color: white; font-size: 16px;
+                                animation: pulse 2s infinite;
+                            "><i class="fas ${v.type === 'train' ? 'fa-train' : v.type === 'tram' ? 'fa-subway' : 'fa-bus'}"></i></div>`,
+                            className: 'tracked-vehicle',
+                            iconSize: [44, 44],
+                            iconAnchor: [22, 22]
+                        });
+                        
+                        trackedRouteVehicles[v.id] = L.marker([v.lat, v.lon], { icon })
+                            .addTo(map)
+                            .bindPopup(`
+                                <div style="font-family: Inter, sans-serif; min-width: 200px;">
+                                    <div style="font-weight: 700; font-size: 16px; color: ${v.type === 'train' ? '#3b82f6' : v.type === 'tram' ? '#06b6d4' : '#10b981'}; margin-bottom: 4px;">
+                                        ${v.route_name}
+                                    </div>
+                                    <div style="color: #64748b; font-size: 13px; margin-bottom: 4px;">To: ${v.destination}</div>
+                                    <div style="font-size: 13px;"><i class="fas fa-map-marker-alt"></i> Next: ${v.next_stop}</div>
+                                    <div style="font-size: 13px;"><i class="fas fa-clock"></i> Arriving: ${v.arrival_minutes} min</div>
+                                    <div style="font-size: 13px;"><i class="fas fa-tachometer-alt"></i> ${v.speed} km/h</div>
+                                </div>
+                            `);
+                    }
+                });
+                
+                // Remove vehicles no longer on route
+                Object.keys(trackedRouteVehicles).forEach(id => {
+                    if (!routeVehicles.find(v => v.id === id)) {
+                        map.removeLayer(trackedRouteVehicles[id]);
+                        delete trackedRouteVehicles[id];
+                    }
+                });
+            } catch (e) {
+                console.error('Failed to update tracked vehicles:', e);
+            }
+        }
+
+        // Override switchTab to clean up tracking
+        const originalSwitchTab = switchTab;
+        switchTab = function(tab) {
+            if (tab !== 'plan' && activeJourney) {
+                stopRouteTracking();
+                stopJourneyMap();
+                // Hide journey containers
+                const mapContainer = document.getElementById('journey-map-container');
+                const vehiclesContainer = document.getElementById('journey-vehicles');
+                if (mapContainer) mapContainer.style.display = 'none';
+                if (vehiclesContainer) vehiclesContainer.style.display = 'none';
+            }
+            originalSwitchTab(tab);
+        };
+
+        // Track a specific route
+        function trackThisRoute(routeIndex) {
+            const fromInput = document.getElementById('trip-from');
+            const toInput = document.getElementById('trip-to');
+            
+            const fromStop = ADELAIDE_STOPS.find(s => s.n === fromInput.value);
+            const toStop = ADELAIDE_STOPS.find(s => s.n === toInput.value);
+            
+            if (!fromStop || !toStop) return;
+            
+            // Show journey status
+            const statusEl = document.getElementById('journey-status');
+            if (statusEl) {
+                statusEl.style.display = 'block';
+                statusEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Finding live vehicles...';
+            }
+            
+            // Show the journey map in the plan tab
+            showJourneyMap(fromStop, toStop, routeIndex);
+        }
+
+        // Journey Map for Plan Tab
+        let journeyMap = null;
+        let journeyMapPolyline = null;
+        let journeyMapVehicles = {};
+        let journeyMapInterval = null;
+
+        function showJourneyMap(fromStop, toStop, routeIndex) {
+            const mapContainer = document.getElementById('journey-map-container');
+            const vehiclesContainer = document.getElementById('journey-vehicles');
+            const vehiclesList = document.getElementById('journey-vehicles-list');
+            
+            // Show containers
+            mapContainer.style.display = 'block';
+            vehiclesContainer.style.display = 'block';
+            
+            // Initialize journey map if not exists
+            if (!journeyMap) {
+                journeyMap = L.map('journey-map', {
+                    zoomControl: false,
+                    attributionControl: false
+                });
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                    maxZoom: 19
+                }).addTo(journeyMap);
+            }
+            
+            // Clear previous route
+            if (journeyMapPolyline) {
+                journeyMap.removeLayer(journeyMapPolyline);
+            }
+            
+            // Draw route line
+            const latlngs = [[fromStop.lat, fromStop.lon], [toStop.lat, toStop.lon]];
+            journeyMapPolyline = L.polyline(latlngs, {
+                color: '#6366f1',
+                weight: 5,
+                opacity: 0.9,
+                dashArray: '12, 8'
+            }).addTo(journeyMap);
+            
+            // Add stop markers
+            const fromIcon = L.divIcon({
+                html: '<div style="width: 16px; height: 16px; background: #10b981; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.4);"></div>',
+                iconSize: [16, 16],
+                iconAnchor: [8, 8]
+            });
+            const toIcon = L.divIcon({
+                html: '<div style="width: 16px; height: 16px; background: #ef4444; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.4);"></div>',
+                iconSize: [16, 16],
+                iconAnchor: [8, 8]
+            });
+            
+            L.marker([fromStop.lat, fromStop.lon], { icon: fromIcon }).addTo(journeyMap)
+                .bindPopup('<b>From:</b> ' + fromStop.n);
+            L.marker([toStop.lat, toStop.lon], { icon: toIcon }).addTo(journeyMap)
+                .bindPopup('<b>To:</b> ' + toStop.n);
+            
+            // Fit bounds
+            journeyMap.fitBounds(journeyMapPolyline.getBounds(), { padding: [60, 60] });
+            
+            // Start live updates
+            startJourneyMapUpdates(fromStop, toStop);
+            
+            // Scroll to map
+            mapContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function startJourneyMapUpdates(fromStop, toStop) {
+            // Clear previous interval
+            if (journeyMapInterval) {
+                clearInterval(journeyMapInterval);
+            }
+            
+            // Update immediately
+            updateJourneyMapVehicles(fromStop, toStop);
+            
+            // Update every 10 seconds
+            journeyMapInterval = setInterval(() => {
+                updateJourneyMapVehicles(fromStop, toStop);
+            }, 10000);
+            
+            // Start trip notifications
+            startTripNotifications(fromStop, toStop, { name: 'Journey' });
+        }
+
+        async function updateJourneyMapVehicles(fromStop, toStop) {
+            const statusEl = document.getElementById('journey-vehicle-status');
+            const vehiclesList = document.getElementById('journey-vehicles-list');
+            
+            try {
+                const res = await fetch('/adelaide-metro/api/vehicles');
+                const data = await res.json();
+                const vehicles = data.vehicles || [];
+                
+                if (vehicles.length === 0) {
+                    statusEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> No vehicle data available';
+                    vehiclesList.innerHTML = '<div style="text-align: center; padding: 1rem; color: var(--text-muted);">Unable to fetch live vehicle data</div>';
+                    return;
+                }
+                
+                // Find vehicles near our route (within 5km of either stop)
+                let relevantVehicles = vehicles.filter(v => {
+                    const distFrom = calculateDistance(fromStop.lat, fromStop.lon, v.lat, v.lon);
+                    const distTo = calculateDistance(toStop.lat, toStop.lon, v.lat, v.lon);
+                    return distFrom < 5 || distTo < 5;
+                });
+                
+                // If no vehicles within 5km, show the closest ones anyway
+                if (relevantVehicles.length === 0) {
+                    // Sort all vehicles by distance to fromStop
+                    relevantVehicles = vehicles
+                        .map(v => ({
+                            ...v,
+                            distFrom: calculateDistance(fromStop.lat, fromStop.lon, v.lat, v.lon)
+                        }))
+                        .sort((a, b) => a.distFrom - b.distFrom)
+                        .slice(0, 3);
+                }
+                
+                if (relevantVehicles.length === 0) {
+                    statusEl.innerHTML = '<i class="fas fa-info-circle"></i> No vehicles currently nearby. Check again shortly.';
+                    vehiclesList.innerHTML = '<div style="text-align: center; padding: 1rem; color: var(--text-muted);">No live vehicles on this route right now</div>';
+                    return;
+                }
+                
+                // Sort by distance to fromStop
+                relevantVehicles.sort((a, b) => {
+                    const distA = calculateDistance(fromStop.lat, fromStop.lon, a.lat, a.lon);
+                    const distB = calculateDistance(fromStop.lat, fromStop.lon, b.lat, b.lon);
+                    return distA - distB;
+                });
+                
+                const nearest = relevantVehicles[0];
+                const dist = calculateDistance(fromStop.lat, fromStop.lon, nearest.lat, nearest.lon);
+                const stopsAway = Math.max(1, Math.ceil(dist * 2));
+                
+                // Check if this is a fallback (vehicles > 5km away)
+                const isFallback = dist >= 5;
+                
+                if (isFallback) {
+                    statusEl.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <div class="live-indicator"></div>
+                            <span><strong>${nearest.route_name}</strong> is the closest vehicle</span>
+                        </div>
+                        <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.25rem;">
+                            ${Math.round(dist * 10) / 10} km away • ${nearest.arrival_minutes} min arrival
+                        </div>
+                    `;
+                } else {
+                    statusEl.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <div class="live-indicator"></div>
+                            <span><strong>${nearest.route_name}</strong> is ${stopsAway} stop${stopsAway > 1 ? 's' : ''} away</span>
+                        </div>
+                        <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.25rem;">
+                            Arriving in ${nearest.arrival_minutes} min • ${nearest.speed} km/h
+                        </div>
+                    `;
+                }
+                
+                // Update vehicle markers on journey map
+                relevantVehicles.forEach(v => {
+                    const color = v.type === 'train' ? '#3b82f6' : v.type === 'tram' ? '#06b6d4' : '#10b981';
+                    const icon = v.type === 'train' ? 'fa-train' : v.type === 'tram' ? 'fa-subway' : 'fa-bus';
+                    
+                    if (journeyMapVehicles[v.id]) {
+                        journeyMapVehicles[v.id].setLatLng([v.lat, v.lon]);
+                    } else {
+                        const vehicleIcon = L.divIcon({
+                            html: `<div style="width: 40px; height: 40px; background: ${color}; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 0 3px ${color}, 0 4px 12px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; animation: pulse 2s infinite;"><i class="fas ${icon}"></i></div>`,
+                            className: 'journey-vehicle-marker',
+                            iconSize: [40, 40],
+                            iconAnchor: [20, 20]
+                        });
+                        
+                        journeyMapVehicles[v.id] = L.marker([v.lat, v.lon], { icon: vehicleIcon })
+                            .addTo(journeyMap)
+                            .bindPopup(`
+                                <div style="font-family: Inter, sans-serif; min-width: 180px;">
+                                    <div style="font-weight: 700; font-size: 15px; color: ${color}; margin-bottom: 3px;">${v.route_name}</div>
+                                    <div style="color: #64748b; font-size: 12px; margin-bottom: 3px;">To: ${v.destination}</div>
+                                    <div style="font-size: 12px;"><i class="fas fa-map-marker-alt"></i> Next: ${v.next_stop}</div>
+                                    <div style="font-size: 12px;"><i class="fas fa-clock"></i> ${v.arrival_minutes} min</div>
+                                </div>
+                            `);
+                    }
+                });
+                
+                // Remove old vehicles
+                Object.keys(journeyMapVehicles).forEach(id => {
+                    if (!relevantVehicles.find(v => v.id === id)) {
+                        journeyMap.removeLayer(journeyMapVehicles[id]);
+                        delete journeyMapVehicles[id];
+                    }
+                });
+                
+                // Update vehicle cards list
+                vehiclesList.innerHTML = relevantVehicles.map(v => {
+                    const color = v.type === 'train' ? '#3b82f6' : v.type === 'tram' ? '#06b6d4' : '#10b981';
+                    const icon = v.type === 'train' ? 'fa-train' : v.type === 'tram' ? 'fa-subway' : 'fa-bus';
+                    const dist = calculateDistance(fromStop.lat, fromStop.lon, v.lat, v.lon);
+                    const stopsAway = Math.max(1, Math.ceil(dist * 2));
+                    
+                    return `
+                        <div class="journey-vehicle-card">
+                            <div class="journey-vehicle-icon" style="background: ${color};">
+                                <i class="fas ${icon}"></i>
+                            </div>
+                            <div class="journey-vehicle-info">
+                                <div class="journey-vehicle-route">${v.route_name}</div>
+                                <div class="journey-vehicle-status">
+                                    ${dist < 5 ? `<i class="fas fa-map-marker-alt"></i> ${stopsAway} stop${stopsAway > 1 ? 's' : ''} away` : `<i class="fas fa-location-arrow"></i> ${Math.round(dist * 10) / 10} km away`} • Next: ${v.next_stop}
+                                </div>
+                            </div>
+                            <div class="journey-vehicle-eta">
+                                <div class="journey-eta-time">${v.arrival_minutes}</div>
+                                <div class="journey-eta-label">min</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+            } catch (e) {
+                console.error('Failed to update journey vehicles:', e);
+                statusEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> Unable to fetch live data';
+                vehiclesList.innerHTML = '<div style="text-align: center; padding: 1rem; color: var(--text-muted);">Error loading vehicle data</div>';
+            }
+        }
+
+        // Clean up journey map when leaving plan tab
+        function stopJourneyMap() {
+            if (journeyMapInterval) {
+                clearInterval(journeyMapInterval);
+                journeyMapInterval = null;
+            }
+            Object.values(journeyMapVehicles).forEach(marker => {
+                if (journeyMap) journeyMap.removeLayer(marker);
+            });
+            journeyMapVehicles = {};
+            
+            // Stop trip notifications
+            stopTripNotifications();
+        }
+
+        // ===== NOTIFICATION SYSTEM =====
+        let notificationPermission = 'default';
+        let activeTripNotifications = [];
+        let notificationCheckInterval = null;
+
+        // Check notification permission on load
+        function initNotifications() {
+            if ('Notification' in window) {
+                notificationPermission = Notification.permission;
+                
+                // Show banner if permission not granted
+                if (notificationPermission !== 'granted') {
+                    const banner = document.getElementById('notification-banner');
+                    if (banner) banner.style.display = 'block';
+                }
+            }
+        }
+
+        // Request notification permission
+        async function requestNotificationPermission() {
+            if (!('Notification' in window)) {
+                alert('Your browser does not support notifications');
+                return;
+            }
+
+            const permission = await Notification.requestPermission();
+            notificationPermission = permission;
+
+            if (permission === 'granted') {
+                // Hide banner
+                const banner = document.getElementById('notification-banner');
+                if (banner) banner.style.display = 'none';
+                
+                // Show success notification
+                new Notification('Adelaide Metro', {
+                    body: 'Notifications enabled! You\'ll get alerts when your transport is arriving.',
+                    icon: '/static/favicon.ico'
+                });
+                
+                // Note: Trip notifications will start when user tracks a specific journey
+            }
+        }
+
+        // Start monitoring trip for notifications
+        function startTripNotifications(fromStop, toStop, routeInfo) {
+            if (notificationPermission !== 'granted') return;
+            
+            // Clear any existing notifications
+            if (notificationCheckInterval) {
+                clearInterval(notificationCheckInterval);
+            }
+            
+            activeTripNotifications = {
+                from: fromStop,
+                to: toStop,
+                route: routeInfo,
+                notified: {
+                    fiveMin: false,
+                    twoMin: false,
+                    arriving: false
+                }
+            };
+            
+            // Check every 30 seconds
+            notificationCheckInterval = setInterval(checkTripNotifications, 30000);
+            
+            // Initial check
+            checkTripNotifications();
+        }
+
+        // Check if we need to send notifications
+        async function checkTripNotifications() {
+            if (!activeTripNotifications || !activeTripNotifications.from) return;
+            
+            try {
+                const res = await fetch('/adelaide-metro/api/vehicles');
+                const data = await res.json();
+                const vehicles = data.vehicles || [];
+                
+                const { from, to, notified } = activeTripNotifications;
+                
+                // Validate from stop data
+                if (!from || !from.lat || !from.lon) return;
+                
+                // Find nearest vehicle (within 5km, or closest available)
+                let relevantVehicles = vehicles.filter(v => {
+                    const distFrom = calculateDistance(from.lat, from.lon, v.lat, v.lon);
+                    return distFrom < 5;
+                });
+                
+                // If none within 5km, get closest
+                if (relevantVehicles.length === 0) {
+                    relevantVehicles = vehicles
+                        .map(v => ({...v, dist: calculateDistance(from.lat, from.lon, v.lat, v.lon)}))
+                        .sort((a, b) => a.dist - b.dist)
+                        .slice(0, 1);
+                }
+                
+                if (relevantVehicles.length === 0) return;
+                
+                const nearest = relevantVehicles.sort((a, b) => {
+                    const distA = calculateDistance(from.lat, from.lon, a.lat, a.lon);
+                    const distB = calculateDistance(from.lat, from.lon, b.lat, b.lon);
+                    return distA - distB;
+                })[0];
+                
+                const arrivalMinutes = nearest.arrival_minutes;
+                
+                // Send notifications at key times
+                if (arrivalMinutes <= 5 && !notified.fiveMin) {
+                    notified.fiveMin = true;
+                    new Notification(`${nearest.route_name} Arriving Soon`, {
+                        body: `Your ${nearest.route_name} is ${arrivalMinutes} minutes away. Get ready!`,
+                        icon: '/static/favicon.ico',
+                        badge: '/static/favicon.ico',
+                        tag: 'trip-5min'
+                    });
+                }
+                
+                if (arrivalMinutes <= 2 && !notified.twoMin) {
+                    notified.twoMin = true;
+                    new Notification(`${nearest.route_name} Almost Here`, {
+                        body: `Only ${arrivalMinutes} minutes! Head to your stop now.`,
+                        icon: '/static/favicon.ico',
+                        badge: '/static/favicon.ico',
+                        tag: 'trip-2min'
+                    });
+                }
+                
+                if (arrivalMinutes <= 1 && !notified.arriving) {
+                    notified.arriving = true;
+                    new Notification(`${nearest.route_name} Arriving Now!`, {
+                        body: `Your ${nearest.route_name} is arriving at ${from.n}!`,
+                        icon: '/static/favicon.ico',
+                        badge: '/static/favicon.ico',
+                        tag: 'trip-arriving',
+                        requireInteraction: true
+                    });
+                }
+                
+            } catch (e) {
+                console.error('Failed to check trip notifications:', e);
+            }
+        }
+
+        // Stop trip notifications
+        function stopTripNotifications() {
+            if (notificationCheckInterval) {
+                clearInterval(notificationCheckInterval);
+                notificationCheckInterval = null;
+            }
+            activeTripNotifications = null;
+        }
+
+        // ===== FULLSCREEN MAP =====
+        let isFullscreenMap = false;
+
+        function toggleFullscreenMap() {
+            const mapContainer = document.getElementById('journey-map-container');
+            const mapWrapper = document.getElementById('journey-map-wrapper');
+            
+            if (!isFullscreenMap) {
+                // Enter fullscreen
+                mapContainer.style.position = 'fixed';
+                mapContainer.style.top = '0';
+                mapContainer.style.left = '0';
+                mapContainer.style.right = '0';
+                mapContainer.style.bottom = '0';
+                mapContainer.style.zIndex = '9999';
+                mapContainer.style.margin = '0';
+                mapContainer.style.background = 'var(--bg-primary)';
+                mapWrapper.style.height = 'calc(100vh - 80px)';
+                
+                document.body.style.overflow = 'hidden';
+                
+                // Update button
+                const btn = document.querySelector('#journey-map-container button');
+                if (btn) btn.innerHTML = '<i class="fas fa-compress"></i> Exit Fullscreen';
+                
+                isFullscreenMap = true;
+            } else {
+                // Exit fullscreen
+                mapContainer.style.position = '';
+                mapContainer.style.top = '';
+                mapContainer.style.left = '';
+                mapContainer.style.right = '';
+                mapContainer.style.bottom = '';
+                mapContainer.style.zIndex = '';
+                mapContainer.style.margin = '1rem';
+                mapContainer.style.background = '';
+                mapWrapper.style.height = '450px';
+                
+                document.body.style.overflow = '';
+                
+                // Update button
+                const btn = document.querySelector('#journey-map-container button');
+                if (btn) btn.innerHTML = '<i class="fas fa-expand"></i> Fullscreen';
+                
+                isFullscreenMap = false;
+            }
+            
+            // Resize map
+            if (journeyMap) {
+                setTimeout(() => {
+                    journeyMap.invalidateSize();
+                }, 100);
+            }
+        }
+
+        // Initialize notifications on load
+        document.addEventListener('DOMContentLoaded', () => {
+            initNotifications();
+        });
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+    <script src="/static/adelaide-metro-enhanced.js"></script>
+</body>
+</html>
