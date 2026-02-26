@@ -4,13 +4,14 @@ Adelaide Metro Live Tracker - Flask Application
 Real-time public transport tracking for Adelaide, Australia
 """
 
-from flask import Flask, jsonify, render_template, request
+import json
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 
-# Import our modules
+from flask import Flask, jsonify, render_template, request
+
 from adelaide_metro_routes import adelaide_metro_bp
-from adelaide_metro_gtfs_realtime import get_vehicles, get_routes, get_alerts
+from utils import calculate_distance
 
 app = Flask(__name__)
 app.register_blueprint(adelaide_metro_bp)
@@ -28,46 +29,12 @@ def health_check():
     """Health check endpoint"""
     return jsonify({
         'status': 'healthy',
-        'timestamp': datetime.utcnow().isoformat(),
+        'timestamp': datetime.now(timezone.utc).isoformat(),
         'version': '1.0.0'
     })
 
-@app.route('/adelaide-metro/api/vehicles')
-def api_vehicles():
-    """Get live vehicle positions"""
-    try:
-        vehicles = get_vehicles()
-        return jsonify({
-            'vehicles': vehicles,
-            'count': len(vehicles),
-            'updated_at': datetime.utcnow().isoformat()
-        })
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-@app.route('/adelaide-metro/api/routes')
-def api_routes():
-    """Get all route definitions"""
-    try:
-        routes = get_routes()
-        return jsonify({
-            'routes': routes,
-            'count': len(routes)
-        })
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-@app.route('/adelaide-metro/api/alerts')
-def api_alerts():
-    """Get active service alerts"""
-    try:
-        alerts = get_alerts()
-        return jsonify({
-            'alerts': alerts,
-            'count': len(alerts)
-        })
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+# Note: /adelaide-metro/api/vehicles, /adelaide-metro/api/routes, and
+# /adelaide-metro/api/alerts are handled by the adelaide_metro_bp blueprint.
 
 @app.route('/adelaide-metro/api/nearby')
 def api_nearby():
@@ -77,37 +44,34 @@ def api_nearby():
         lon = float(request.args.get('lon'))
         radius = float(request.args.get('radius', 500))
         limit = int(request.args.get('limit', 5))
-        
-        # Import stops data
-        import json
-        stops = json.loads(open('static/adelaide-metro-stops.js').read().split('=')[1].rstrip(';'))
-        
-        # Calculate distances and filter
-        from math import radians, sin, cos, sqrt, atan2
-        
-        def haversine(lat1, lon1, lat2, lon2):
-            R = 6371000  # Earth radius in meters
-            phi1, phi2 = radians(lat1), radians(lat2)
-            dphi = radians(lat2 - lat1)
-            dlambda = radians(lon2 - lon1)
-            a = sin(dphi/2)**2 + cos(phi1) * cos(phi2) * sin(dlambda/2)**2
-            return 2 * R * atan2(sqrt(a), sqrt(1-a))
-        
+
+        # Load stops data safely
+        stops_path = os.path.join(app.root_path, 'static', 'adelaide-metro-stops.js')
+        with open(stops_path, 'r') as f:
+            raw = f.read()
+        # The JS file has extra functions after the array; extract just the JSON array
+        after_eq = raw.split('=', 1)[1]
+        bracket_end = after_eq.index('];') + 1
+        stops = json.loads(after_eq[:bracket_end].strip())
+
         nearby = []
         for stop in stops:
-            dist = haversine(lat, lon, stop['lat'], stop['lon'])
-            if dist <= radius:
-                nearby.append({**stop, 'distance': round(dist)})
-        
+            # calculate_distance returns km, convert to meters
+            dist_m = calculate_distance(lat, lon, stop['lat'], stop['lon']) * 1000
+            if dist_m <= radius:
+                nearby.append({**stop, 'distance': round(dist_m)})
+
         nearby.sort(key=lambda x: x['distance'])
-        
+
         return jsonify({
             'stops': nearby[:limit],
             'center': {'lat': lat, 'lon': lon},
             'radius': radius
         })
+    except (TypeError, ValueError) as e:
+        return jsonify({'error': f'Invalid parameters: {e}'}), 400
     except Exception as e:
-        return jsonify({'error': str(e)}), 400
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/adelaide-metro/api/plan', methods=['POST'])
 def api_plan_trip():

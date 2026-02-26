@@ -4,31 +4,20 @@ Adelaide Metro Tracker - Flask Blueprint
 Comprehensive public transport tracking for Adelaide
 """
 
-from flask import Blueprint, jsonify, request, render_template_string, current_app
 import json
 import os
-import math
+import random
+
 from datetime import datetime, timedelta
+from flask import Blueprint, jsonify, request, send_from_directory
 
-def calculate_distance(lat1, lon1, lat2, lon2):
-    """Calculate distance in km between two coordinates using Haversine formula"""
-    R = 6371  # Earth's radius in km
-    
-    lat1_rad = math.radians(lat1)
-    lat2_rad = math.radians(lat2)
-    delta_lat = math.radians(lat2 - lat1)
-    delta_lon = math.radians(lon2 - lon1)
-    
-    a = math.sin(delta_lat/2)**2 + math.cos(lat1_rad) * math.cos(lat2_rad) * math.sin(delta_lon/2)**2
-    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
-    
-    return R * c
-
-# Import GTFS manager
-try:
-    from adelaide_metro_gtfs import adelaide_metro
-except ImportError:
-    adelaide_metro = None
+from utils import (
+    calculate_bearing,
+    calculate_distance,
+    format_adelaide_time,
+    get_adelaide_time,
+    is_in_adelaide,
+)
 
 adelaide_metro_bp = Blueprint('adelaide_metro', __name__, url_prefix='/adelaide-metro')
 
@@ -617,17 +606,20 @@ MAJOR_STOPS = [
 @adelaide_metro_bp.route('/')
 def index():
     """Main Adelaide Metro tracker page"""
-    return send_from_directory('/opt/raya-monitor/templates/adelaide-metro', 'index.html')
+    templates_dir = os.path.join(os.path.dirname(__file__), 'templates')
+    return send_from_directory(templates_dir, 'index.html')
 
 @adelaide_metro_bp.route('/qrcode.js')
 def serve_qrcode_js():
     """Serve QR code library"""
-    return send_from_directory('/opt/raya-monitor/templates/adelaide-metro', 'qrcode.js')
+    templates_dir = os.path.join(os.path.dirname(__file__), 'templates')
+    return send_from_directory(templates_dir, 'qrcode.js')
 
 @adelaide_metro_bp.route('/sw.js')
 def serve_sw_js():
     """Serve Service Worker"""
-    return send_from_directory('/opt/raya-monitor/templates/adelaide-metro', 'sw.js')
+    templates_dir = os.path.join(os.path.dirname(__file__), 'templates')
+    return send_from_directory(templates_dir, 'sw.js')
 
 @adelaide_metro_bp.route('/api/routes')
 def get_routes():
@@ -655,7 +647,7 @@ def get_routes():
 
 # Import GTFS realtime fetcher
 try:
-    from adelaide_metro_gtfs_realtime import fetch_realtime_vehicles, get_cached_vehicles
+    from adelaide_metro_gtfs_realtime import get_cached_vehicles
     GTFS_AVAILABLE = True
 except ImportError:
     GTFS_AVAILABLE = False
@@ -920,53 +912,12 @@ def interpolate_position(waypoints, progress):
     # Return last waypoint if we get here
     return waypoints[-1]
 
-def calculate_bearing(lat1, lon1, lat2, lon2):
-    """Calculate bearing between two points"""
-    import math
-    d_lon = math.radians(lon2 - lon1)
-    lat1 = math.radians(lat1)
-    lat2 = math.radians(lat2)
-    
-    x = math.sin(d_lon) * math.cos(lat2)
-    y = math.cos(lat1) * math.sin(lat2) - math.sin(lat1) * math.cos(lat2) * math.cos(d_lon)
-    
-    bearing = math.degrees(math.atan2(x, y))
-    return (bearing + 360) % 360
-
-# Adelaide timezone offset (UTC+10:30 or UTC+9:30 for DST)
-# Simplified: using UTC+10:30 (Adelaide standard time)
-from datetime import datetime, timedelta
-
-# Adelaide metro area bounds - covers all of Greater Adelaide
-ADELAIDE_BOUNDS = {
-    'min_lat': -35.25,  # South to Aldinga/Seaford
-    'max_lat': -34.55,  # North to Gawler
-    'min_lon': 138.40,  # West to Outer Harbor/Glenelg
-    'max_lon': 138.80   # East to Mount Barker/Hills
-}
-
-def is_in_adelaide(lat, lon):
-    """Check if coordinates are within Adelaide metro area"""
-    return (ADELAIDE_BOUNDS['min_lat'] <= lat <= ADELAIDE_BOUNDS['max_lat'] and
-            ADELAIDE_BOUNDS['min_lon'] <= lon <= ADELAIDE_BOUNDS['max_lon'])
-
-def get_adelaide_time():
-    """Get current time in Adelaide timezone"""
-    # Adelaide is UTC+10:30 (standard) or UTC+9:30 (DST)
-    utc_now = datetime.utcnow()
-    # Simple approximation: Adelaide is +10:30 from UTC
-    adelaide_offset = timedelta(hours=10, minutes=30)
-    return utc_now + adelaide_offset
-
-ADELAIDE_TZ = 'Australia/Adelaide'
-
-def format_adelaide_time(dt):
-    """Format datetime for Adelaide timezone"""
-    return dt.strftime('%Y-%m-%dT%H:%M:%S') + '+10:30'
+# calculate_bearing, is_in_adelaide, get_adelaide_time, format_adelaide_time
+# are now imported from utils.py (see top of file)
 
 def get_next_stop_for_position(lat, lon, waypoints, destinations, route_type, route_id=None):
     """Calculate the actual next stop based on vehicle position and route direction"""
-    import math
+    import math  # used for sqrt only within this function
     
     city_lat, city_lon = -34.9211, 138.5958  # Adelaide CBD
     
@@ -1055,8 +1006,7 @@ def get_vehicles():
     
     # Fall back to simulation
     vehicles = []
-    import random
-    
+
     # Set seed for consistent vehicle generation during this request
     random.seed(42)
     
@@ -1190,48 +1140,6 @@ def get_vehicles():
                 'arrival_minutes': arrival_mins,
                 'updated_at': format_adelaide_time(get_adelaide_time())
             })
-        if route_id and bus['id'] != route_id:
-            continue
-        if vehicle_type and vehicle_type != 'bus':
-            continue
-        
-        waypoints = bus.get('waypoints', [(-34.9285, 138.6007)])
-        
-        # Increase bus count for better coverage
-        for i in range(random.randint(3, 6)):
-            progress = random.uniform(0, 1)
-            lat, lon = interpolate_position(waypoints, progress)
-            lat += random.uniform(-0.002, 0.002)
-            lon += random.uniform(-0.002, 0.002)
-            
-            # Skip if not in Adelaide metro area
-            if not is_in_adelaide(lat, lon):
-                continue
-            
-            next_progress = min(1, progress + 0.01)
-            next_lat, next_lon = interpolate_position(waypoints, next_progress)
-            bearing = calculate_bearing(lat, lon, next_lat, next_lon)
-            
-            # Get actual next stop
-            next_stop, arrival_mins = get_next_stop_for_position(
-                lat, lon, waypoints, bus['destinations'], 'bus', bus['id']
-            )
-            
-            vehicles.append({
-                'id': f"{bus['id']}_{i}",
-                'route_id': bus['id'],
-                'route_name': bus['name'],
-                'type': 'bus',
-                'lat': lat,
-                'lon': lon,
-                'bearing': bearing,
-                'speed': random.randint(30, 60),
-                'destination': random.choice(bus['destinations']),
-                'status': random.choice(['on-time', 'on-time', 'delayed', 'early']),
-                'next_stop': next_stop,
-                'arrival_minutes': arrival_mins,
-                'updated_at': format_adelaide_time(get_adelaide_time())
-            })
     
     return jsonify({
         'vehicles': vehicles,
@@ -1339,7 +1247,6 @@ def get_stop_times(stop_id):
     """Get upcoming departures for a stop"""
     
     # Mock stop times
-    import random
     times = []
     now = datetime.now()
     
@@ -1364,6 +1271,3 @@ def get_stop_times(stop_id):
         'departures': times,
         'updated_at': datetime.now().isoformat()
     })
-
-# Import send_from_directory for the index route
-from flask import send_from_directory
