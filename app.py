@@ -49,7 +49,10 @@ def api_nearby():
         stops_path = os.path.join(app.root_path, 'static', 'adelaide-metro-stops.js')
         with open(stops_path, 'r') as f:
             raw = f.read()
-        stops = json.loads(raw.split('=', 1)[1].rstrip(';\n '))
+        # The JS file has extra functions after the array; extract just the JSON array
+        after_eq = raw.split('=', 1)[1]
+        bracket_end = after_eq.index('];') + 1
+        stops = json.loads(after_eq[:bracket_end].strip())
 
         nearby = []
         for stop in stops:
